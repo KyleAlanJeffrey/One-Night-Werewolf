@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
+/* font-family: 'Alegreya Sans', sans-serif; */
+:root{
+    --anim-speed: .4s;
+}
+body{
+    font-family: 'Alegreya Sans', sans-serif;
+    font-weight: 700;
+    overflow: hidden;
+}
+#host-privileges{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+#user-list{
+    position: absolute;
+    opacity: .8;
+}
+.user.bad{
+    color: var(--red) !important;
+}
+.user.good{
+    color: var(--green);
+}
+#join-game-overlay{
+    position: absolute;
+    z-index: 100;
+    background-color: black;
+    height: 100%;
+    width: 100%;
+    /* filter: blur(); */
+    opacity: .9;
+    transition: opacity 1s;
+}
+
+#table{
+    position: absolute;
+    border: solid black 3px;
+    z-index: -10;
+    background-color: red;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+#board{
+    position: absolute;
+    height: 100%;
+    width: 100%;
+}
+#start-game-button{
+    display: none;
+}
+/* Card Aspect Ratio: 1.4 */
+.card{
+    width: 100px;
+    height: 140px;
+    background-size: cover;
+}
+.card span{
+    position: absolute;
+    top: 145px;
+}
+.villager{
+    background-image: url(../img/cards/villager.jpg);
+}
+.wolf{
+    background-image: url(../img/cards/wolf.png);
+}
+.tanner{
+    background-image: url(../img/cards/tanner.jpg);
+}
+.robber{
+    background-image: url(../img/cards/robber.jpg);
+}
+.alpha{
+    background-image: url(../img/cards/alpha.jpg);
+}
+.hidden-card{
+    background-image: url(../img/cards/back.jpg);
+}
+.new-card{
+    animation: new-card-anim var(--anim-speed);
+}
+.reveal-card{
+    animation: reveal-card-anim var(--anim-speed);
+}
+@keyframes reveal-card-anim{
+    to{
+        transform: translateX(180deg);
+    }
+}
+@keyframes new-card-anim {
+    0% { transform: scale(2); }
+    75% { transform: scale(.8); }
+    100% {transform: scale(1);}
+}
