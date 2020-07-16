@@ -1,4 +1,4 @@
-const SERVER = 'localhost:5000';
+const SERVER = 'localhost:3000';
 let board = undefined;
 let userList = undefined;
 let socket = undefined;
