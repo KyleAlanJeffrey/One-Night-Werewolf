@@ -1,40 +1,53 @@
 @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
 /* font-family: 'Alegreya Sans', sans-serif; */
-:root{
+
+:root {
     --anim-speed: .4s;
 }
-body{
+
+body {
     font-family: 'Alegreya Sans', sans-serif;
     font-weight: 700;
     overflow: hidden;
+    background-image: url(../img/bg/bg1.jpg);
+    background-size: cover;
+    backdrop-filter: blur(5px);
 }
-#host-privileges{
+.blur {
+    backdrop-filter: blur(5px);
+}
+
+#host-privileges {
     position: absolute;
     height: 100%;
     width: 100%;
 }
-#user-list{
+
+#user-list {
     position: absolute;
     opacity: .8;
+    font-size: xx-large;
 }
-.user.bad{
+
+.user.bad {
     color: var(--red) !important;
 }
-.user.good{
+
+.user.good {
     color: var(--green);
 }
-#join-game-overlay{
+
+#join-game-overlay {
     position: absolute;
     z-index: 100;
     background-color: black;
     height: 100%;
     width: 100%;
-    /* filter: blur(); */
     opacity: .9;
     transition: opacity 1s;
 }
 
-#table{
+#table {
     position: absolute;
     border: solid black 3px;
     z-index: -10;
@@ -43,55 +56,151 @@ body{
     height: 100%;
     border-radius: 50%;
 }
-#board{
+
+#board {
     position: absolute;
     height: 100%;
     width: 100%;
 }
-#start-game-button{
+
+#countdown-clock {
+    position: absolute;
+    width: 100%;
+    z-index: 101;
     display: none;
 }
-/* Card Aspect Ratio: 1.4 */
-.card{
-    width: 100px;
-    height: 140px;
-    background-size: cover;
+
+#timer {
+    display: none;
 }
-.card span{
+
+#start-game-button {
+    display: none;
+}
+
+#game-start-message {
+    z-index: 1000;
+    background-color: black;
+    transition: top 1s;
     position: absolute;
-    top: 145px;
+    height: 100%;
+    width: 100%;
+    top: 100%;
+    text-align: center;
+    font-weight: 900;
+    font-style: italic;
+    color: red;
 }
-.villager{
+
+#game-start-message h1, h2 {
+    transform: scale(2);
+}
+
+#game-start-message h2 {
+    transition: opacity 1.5s ease-in;
+    opacity: 0;
+}
+
+.slam {
+    animation: slam-anim 1s ease-in;
+}
+
+/*--------------------
+        CARDS
+ ---------------------*/
+
+/* Card Aspect Ratio: 1.4 */
+
+.card {
+    width: 150px;
+    height: 210px;
+    background-size: cover;
+    z-index: 100;
+    transition: transform var(--anim-speed);
+}
+
+.card:hover {
+    transform: scale(1.1);
+    cursor: pointer;
+}
+
+.card span {
+    position: absolute;
+    top: 215px;
+    left: 60px;
+    font-size: x-large;
+    color: white;
+    /* text-shadow: 1px 1px 1px 1px #000000; */
+}
+.card .crosshair{
+    background-image: url(../img/crosshair.png);
+    background-size: contain;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: -50;
+    top: -25;
+    width: 250px;
+    height: 310px;
+}
+.villager {
     background-image: url(../img/cards/villager.jpg);
 }
-.wolf{
+
+.wolf {
     background-image: url(../img/cards/wolf.png);
 }
-.tanner{
+
+.tanner {
     background-image: url(../img/cards/tanner.jpg);
 }
-.robber{
+
+.robber {
     background-image: url(../img/cards/robber.jpg);
 }
-.alpha{
+
+.alpha {
     background-image: url(../img/cards/alpha.jpg);
 }
-.hidden-card{
+
+.hidden-card {
     background-image: url(../img/cards/back.jpg);
 }
-.new-card{
+
+.new-card {
     animation: new-card-anim var(--anim-speed);
 }
-.reveal-card{
-    animation: reveal-card-anim var(--anim-speed);
+
+.reveal-card {
+    /* transform: rotateY(180deg) scaleX(-1); */
+    /* animation: reveal-card-anim var(--anim-speed); */
 }
-@keyframes reveal-card-anim{
-    to{
-        transform: translateX(180deg);
+
+@keyframes reveal-card-anim {
+    100% {
+        transform: rotateY(180deg);
     }
 }
+
 @keyframes new-card-anim {
-    0% { transform: scale(2); }
-    75% { transform: scale(.8); }
-    100% {transform: scale(1);}
+    0% {
+        transform: scale(2);
+    }
+    75% {
+        transform: scale(.8);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes slam-anim {
+    0% {
+        transform: scale(4);
+    }
+    75% {
+        transform: scale(.8);
+    }
+    100% {
+        transform: scale(1);
+    }
 }

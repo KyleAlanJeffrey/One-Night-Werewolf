@@ -10,7 +10,11 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
-<body>
+<body class="">
+    <div id='countdown-clock' class="d-flex text-danger justify-content-center p-3">
+        <h1 id="timer">TIME: 100</h1>
+    </div>
+
     <div id="join-game-overlay">
         <div class="d-flex text-white justify-content-center align-items-center flex-column" style="height: 100%;">
             <h1>ONE NIGHT WEREWOLF</h1>
@@ -21,10 +25,21 @@
             <button onclick="joinServer();" class="btn btn-md btn-success">Join Server</button>
         </div>
     </div>
-    <div class="container-fluid d-flex justify-content-center align-items-center" id="board"></div>
+    <div id='game-start-message' class="d-flex justify-content-center align-content-center flex-column">
+        <h1 class="mb-4">THE CLOCK STRIKES 12...</h1>
+        <h2>You Have 100 seconds</h2>
+    </div>
+    <div class="container-fluid d-flex justify-content-center align-items-center" id="board">
+     <!-- <div class="card m-3 villager reveal-card">
+        <div class="crosshair">
 
-    <div id="host-privileges" class="container-fluid d-flex align-items-end justify-content-center p-3">
-        <button id="start-game-button" class="btn btn-success btn-lg" onclick="startGame()">Start Game</button>
+        </div>    
+            <span>User 69</span>
+        </div> -->
+    </div>
+
+    <div id="host-privileges" class="container-fluid d-inline-flex align-items-end justify-content-center p-3">
+        <button id="start-game-button" class="btn btn-success btn-lg" onclick="hostRequestStart()">Start Game</button>
     </div>
     <ul class="bg-dark text-white px-4" id="user-list">
     </ul>
@@ -40,6 +55,7 @@
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
     <script type="text/javascript" src="js/client.js"></script>
+
 </body>
 
 </html>
