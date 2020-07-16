@@ -1,4 +1,6 @@
 const SERVER = '/';
+const TITLE_ANIM_TIME = 3500;
+
 let board = undefined;
 let userList = undefined;
 let socket = undefined;
@@ -82,9 +84,10 @@ function startGame(playerData) {
     countDownClock();
     $('#game-start-message').css('top', '0');
     $('#game-start-message > h2').css('opacity', '1');
+    $('#clear-vote-button').fadeIn(TITLE_ANIM_TIME);
     setTimeout(() => {
         $('#game-start-message').css('top', '100%');
-    }, 3500);
+    }, TITLE_ANIM_TIME);
 }
 function countDownClock() {
     $('#timer').toggle().addClass('new-card');
@@ -120,7 +123,7 @@ function cardClicked(playerObj) {
         let crosshair = jQuery('<div/>', {
             "class": `crosshair`,
         }).appendTo(playerObj.cardElement);
-        guess = card.name;
+        guess = playerObj.name;
     }
     // console.log(card)
 }

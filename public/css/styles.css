@@ -17,16 +17,19 @@ body {
     backdrop-filter: blur(5px);
 }
 
-#host-privileges {
+#taskbar {
     position: absolute;
     height: 100%;
     width: 100%;
 }
-
+#clear-vote-button{
+    display: none;
+}
 #user-list {
     position: absolute;
     opacity: .8;
-    font-size: xx-large;
+    font-size: x-large;
+    list-style: none;
 }
 
 .user.bad {
@@ -127,9 +130,10 @@ body {
 .card span {
     position: absolute;
     top: 215px;
-    left: 60px;
+    text-align: center;
     font-size: x-large;
     color: white;
+    width: 100%;
     /* text-shadow: 1px 1px 1px 1px #000000; */
 }
 .card .crosshair{

@@ -34,7 +34,7 @@ class Room {
     }
 }
 const rooms = [];
-const ROOM_SIZE = 8;
+const ROOM_SIZE = 5;
 rooms.push(new Room()); //Initialize first server
 
 // THE PLAYERS WILL BE QUERY BY IP WHEN FINISHED
