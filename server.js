@@ -19,9 +19,11 @@ server.listen(PORT, () => {
 -------------------------*/
 // initialize io
 class Player {
-    constructor(name) {
+    constructor(name, lead) {
         this.name = name;
         this.role = undefined;
+        this.vote = undefined;
+        this.leader = lead; // bool
     }
 }
 class Room {
@@ -31,16 +33,17 @@ class Room {
         this.roles = ['wolf', 'wolf', 'wolf', 'villager', 'villager', 'villager', 'alpha', 'robber', 'tanner'];
         this.name = 'room ' + (rooms.length + 1);
         this.gameRunning = false;
+        this.votesSubmitted = 0;
     }
 }
 const rooms = [];
-const ROOM_SIZE = 5;
+const ROOM_SIZE = 3;
 rooms.push(new Room()); //Initialize first server
 
 // THE PLAYERS WILL BE QUERY BY IP WHEN FINISHED
 io.sockets.on('connection', (socket) => {
-    // console.log('New Connection From: ' + socket.id);
 
+    /*------------------ Start Game Event ------------------ */
     socket.on('hostStartRequest', (roomName, hostCallback) => {
         console.log('Host started game on ' + roomName);
         let members = startGame(roomName);
@@ -48,6 +51,23 @@ io.sockets.on('connection', (socket) => {
         socket.to(roomName).emit('startGame', members);
     });
 
+    /*------------------ Vote Submission Event ------------------ */
+    socket.on('submitVote', (player) => {
+        console.log(`${player.name} voted against ${player.vote}`);
+        let room = rooms.find(r => { return player.room == r.name; });
+        room.votesSubmitted++;
+        let serverPlayer = room.players.find(p => { return player.name == p.name; });
+        serverPlayer.vote = room.players.find(p => { return player.vote == p.name; });
+
+        // If everyone but one has submitted vote
+        if (room.votesSubmitted == room.players.length - 1) {
+            console.log(`Determing Winners in ${room.name}`);
+            let winners = determineWinners(room);
+            socket.emit('endGame', winners);
+        }
+    })
+
+    /*------------------ Join A Room Event ------------------ */
     socket.on('join', (data, sendPlayers) => {
         let leader = false;
 
@@ -59,7 +79,7 @@ io.sockets.on('connection', (socket) => {
         }
         let players = room.players;
         if (!players.length) leader = true;
-        let player = new Player(data.name);
+        let player = new Player(data.name, leader);
         if (leader) room.leader = player.name;
         players.push(player);
         socket.join(room.name); // Join the socket room 
@@ -82,5 +102,17 @@ function startGame(roomName) {
         room.roles.splice(roleIndex, 1);
     });
     return members;
+}
+function determineWinners(room) {
+    let winners = [];
+    let players = room.players;
+
+    for (let i = 0; i < players.length; i++) {
+        const player = players[i];
+        if (player.role == 'tanner') {
+            console.log('Tanner')
+        }
+    }
+    return winners;
 }
 

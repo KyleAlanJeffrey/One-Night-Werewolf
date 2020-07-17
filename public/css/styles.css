@@ -1,8 +1,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Alegreya+Sans:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dosis&display=swap');
 /* font-family: 'Alegreya Sans', sans-serif; */
 
 :root {
     --anim-speed: .4s;
+    --aqua-base-color: aqua;
+    --success-base-color: #65ff2d;
+    --secondary-base-color: #efff0b;
+    --hover-color: orange;
 }
 
 body {
@@ -12,7 +17,9 @@ body {
     background-image: url(../img/bg/bg1.jpg);
     background-size: cover;
     backdrop-filter: blur(5px);
+    user-select: none;
 }
+
 .blur {
     backdrop-filter: blur(5px);
 }
@@ -22,9 +29,114 @@ body {
     height: 100%;
     width: 100%;
 }
-#clear-vote-button{
+
+/* ---------------
+        Buttons
+------------------*/
+#start-game-button {
     display: none;
 }
+
+#clear-vote-button {
+    display: none;
+}
+#submit-vote-button{
+    display: none;
+}
+.submisson-container {
+    position: absolute;
+    width: 100%;
+    height: 95%;
+}
+
+.horizontal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 200px;
+    height: 80px;
+    margin: 20px;
+    border-radius: 5px;
+    font-size: 2rem;
+    cursor: pointer;
+    font-family: "Dosis", sans-serif;
+}
+
+.horizontal.aqua {
+    border: 7px solid var(--aqua-base-color);
+}
+.horizontal.success {
+    border: 7px solid var(--success-base-color);
+}
+.horizontal.secondary {
+    border: 7px solid var(--secondary-base-color);
+}
+
+.horizontal .text {
+    position: relative;
+    color: transparent;
+    background-repeat: repeat;
+    background-size: 200%;
+    background-position: 100% 0;
+    -webkit-background-clip: text;
+    background-clip: text;
+    transition: background-position 300ms;
+}
+
+.horizontal.aqua .text {
+    background-image: linear-gradient( 90deg, var(--hover-color) 0%, var(--hover-color) 50%, var(--aqua-base-color) 50%, var(--aqua-base-color) 100%);
+}
+.horizontal.success .text {
+    background-image: linear-gradient( 90deg, var(--hover-color) 0%, var(--hover-color) 50%, var(--success-base-color) 50%, var(--success-base-color) 100%);
+}
+.horizontal.secondary .text {
+    background-image: linear-gradient( 90deg, var(--hover-color) 0%, var(--hover-color) 50%, var(--secondary-base-color) 50%, var(--secondary-base-color) 100%);
+}
+
+.horizontal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: 100% 0;
+    transform: scale3d(0, 1, 1);
+    transition: transform 300ms;
+}
+
+.horizontal.aqua::before {
+    background: var(--aqua-base-color);
+}
+.horizontal.success::before {
+    background: var(--success-base-color);
+}
+.horizontal.secondary::before {
+    background: var(--secondary-base-color);
+}
+
+.horizontal:hover .text {
+    background-position: 0 0;
+}
+
+.horizontal:hover::before {
+    transform-origin: 0 0;
+    transform: scale3d(1, 1, 1);
+}
+.horizontal.active .text{
+    background-position: 0 0;
+}
+.horizontal.active::before {
+    transform-origin: 0 0;
+    transform: scale3d(1, 1, 1);
+}
+
+
+/* ---------------
+         
+------------------*/
+
 #user-list {
     position: absolute;
     opacity: .8;
@@ -33,11 +145,21 @@ body {
 }
 
 .user.bad {
-    color: var(--red) !important;
+    color: var(--red);
 }
 
 .user.good {
     color: var(--green);
+}
+
+#settings-toolbar {
+    position: absolute;
+    width: 100%;
+    height: 200px;
+    top: 100%;
+    background-color: grey;
+    /* z-index: 1000; */
+    transition: .3s ease-in;
 }
 
 #join-game-overlay {
@@ -47,6 +169,7 @@ body {
     height: 100%;
     width: 100%;
     opacity: .9;
+    /* display: none; */
     transition: opacity 1s;
 }
 
@@ -77,13 +200,12 @@ body {
     display: none;
 }
 
-#start-game-button {
-    display: none;
-}
 
 #game-start-message {
     z-index: 1000;
-    background-color: black;
+    /* background-color: black; */
+    background-image: url(../img/bg/lightning2.gif);
+    background-size: cover;
     transition: top 1s;
     position: absolute;
     height: 100%;
@@ -119,7 +241,10 @@ body {
     height: 210px;
     background-size: cover;
     z-index: 100;
+    border-radius: 10px;
     transition: transform var(--anim-speed);
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
 .card:hover {
@@ -132,11 +257,11 @@ body {
     top: 215px;
     text-align: center;
     font-size: x-large;
-    color: white;
     width: 100%;
     /* text-shadow: 1px 1px 1px 1px #000000; */
 }
-.card .crosshair{
+
+.card .crosshair {
     background-image: url(../img/crosshair.png);
     background-size: contain;
     background-repeat: no-repeat;
@@ -146,28 +271,66 @@ body {
     width: 250px;
     height: 310px;
 }
+
+.card-info {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    user-select: none;
+    opacity: 0;
+    border-radius: 15px;
+    background-color: rgb(0, 0, 0);
+    transition: var(--anim-speed);
+    color: white;
+}
+
+.card-info span {
+    position: relative;
+    top: 0;
+    font-size: large;
+}
+
+.card-info:hover {
+    opacity: .9;
+}
+
+/* .card-info button{
+    position: absolute;
+    border-radius: 5px;
+    font-size: large;
+    left: 3px;
+    top: 85%;
+
+} */
+
 .villager {
     background-image: url(../img/cards/villager.jpg);
+    color: green;
 }
 
 .wolf {
     background-image: url(../img/cards/wolf.png);
+    color: red;
 }
 
 .tanner {
     background-image: url(../img/cards/tanner.jpg);
+    color: gold;
 }
 
 .robber {
     background-image: url(../img/cards/robber.jpg);
+    color: green;
 }
 
 .alpha {
     background-image: url(../img/cards/alpha.jpg);
+    color: red;
 }
 
 .hidden-card {
     background-image: url(../img/cards/back.jpg);
+    color: aqua;
 }
 
 .new-card {

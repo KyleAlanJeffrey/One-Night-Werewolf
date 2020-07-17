@@ -6,9 +6,11 @@ let userList = undefined;
 let socket = undefined;
 let playerArray = [];
 let username = undefined;
-let server = undefined;
-let countdown = 100;
-let guess = undefined;
+let room = undefined;
+let countdown = 300;
+let leader = false;
+let voteLocked = false;
+let vote = 'none';
 
 $(document).ready(function () {
     socket = io.connect(SERVER);
@@ -17,37 +19,66 @@ $(document).ready(function () {
     userList = $('#user-list');
     socket.on('newPlayer', addPlayer);
     socket.on('startGame', startGame);
+    socket.on('endGame', endGame);
     // preload();
 });
 
+
+function countDownClock() {
+    $('#timer').toggle().addClass('new-card');
+    let x = setInterval(() => {
+        countdown--;
+        $('#timer').text('TIME: ' + countdown);
+        if (!countdown) {
+            clearInterval(x);
+        }
+    }, 1000);
+}
+
+function setRoles(playerData) {
+    playerData.forEach(p => {
+        if (p.name == username) return;
+        let localP = playerArray.find((localPlayer) => {
+            return localPlayer.name == p.name;
+        });
+        console.log('Setting ' + localP.name + ' to ' + p.role);
+        localP.setRole(p.role);
+    });
+}
+/*------------------------
+        Socket EVENTS
+-------------------------*/
 function joinServer() {
     username = $('#usr').val();
-    socket.emit('join', { name: username, }, (data, lead, serverName) => {
-        if (lead) addLeadPermissions();
-        server = serverName;
+    socket.emit('join', { name: username, }, (data, lead, roomName) => {
+        if (lead) {
+            $('#start-game-button').css('display', 'flex');
+            leader = true;
+        }
+        room = roomName;
         playerData = data;
         loadPlayers(playerData);
     });
-
     $('#join-game-overlay').css('opacity', '0');
     setTimeout(() => { $('#join-game-overlay').hide(); }, 1000);
 }
+
 function loadPlayers(playerData) {
     playerData.forEach(player => {
         addPlayer(player);
     });
 }
+
 function addPlayer(player) {
-    let options = { item: '' };
+    let options = { item: '', host: '' };
     if (username == player.name) {
         options.item = 'good';
-
     }
-
+    if (player.leader) options.host = ' (host)';
     // Add player to playerlist
     let listItem = jQuery('<li/>', {
         "class": `user ${options.item}`,
-        'text': player.name
+        'text': player.name + options.host,
     });
     listItem.appendTo(userList);
 
@@ -62,70 +93,73 @@ function addPlayer(player) {
     card.appendTo(board);
     let playerObj = new Player(player.name, undefined, card, listItem);
     playerArray.push(playerObj);
+
+    // Give cardElement events
     card.on('click', () => { cardClicked(playerObj); });
+    card.on('onmouseover', () => { cardMousedOver(playerObj); });
 
     setTimeout(() => {
         $('.new-card').removeClass('new-card');
     }, 1000);
 }
 
-function addLeadPermissions() {
-    $('#start-game-button').show();
-}
-
-function hostRequestStart() {
-    socket.emit('hostStartRequest', server, (playerData) => {
-        startGame(playerData);
-    });
-    $('#start-game-button').hide();
-}
 function startGame(playerData) {
     setRoles(playerData);
     countDownClock();
     $('#game-start-message').css('top', '0');
     $('#game-start-message > h2').css('opacity', '1');
-    $('#clear-vote-button').fadeIn(TITLE_ANIM_TIME);
+    $('#clear-vote-button').css('display', 'flex');
+    $('#submit-vote-button').css('display', 'flex');
+
     setTimeout(() => {
         $('#game-start-message').css('top', '100%');
     }, TITLE_ANIM_TIME);
 }
-function countDownClock() {
-    $('#timer').toggle().addClass('new-card');
-    let x = setInterval(() => {
-        countdown--;
-        $('#timer').text('TIME: ' + countdown);
-        if (!countdown) {
-            clearInterval(x);
-        }
-    }, 1000);
+function endGame(winners) {
+    console.log(`${(winners)} won`);
+    countdown = 0;
 }
-
-function setRoles(playerData) {
-    console.log(playerData)
-    playerData.forEach(p => {
-        if (p.name == username) return;
-        let localP = playerArray.find((localPlayer) => {
-            return localPlayer.name == p.name;
-        });
-        console.log('Setting ' + localP.name + ' to ' + p.role);
-        localP.setRole(p.role);
+/*------------------------
+        Button EVENTS
+-------------------------*/
+function hostRequestStart() {
+    socket.emit('hostStartRequest', room, (playerData) => {
+        startGame(playerData);
     });
+    $('#start-game-button').hide();
+}
+function clearVote() {
+    if (voteLocked) return;
+    guess = 'none';
+    $('#clear-vote-button').toggleClass('active');
+    $('.crosshair').remove();
+}
+function lockVote() {
+    if (!voteLocked) {
+        voteLocked = true;
+        $('#submit-vote-button').addClass('active');
+        socket.emit('submitVote', { name: username, vote: vote, room: room });
+    }
 }
 
-/*-------------------
+/*------------------------
         CARD EVENTS
-------------------*/
+-------------------------*/
 function cardClicked(playerObj) {
     // if game started
-    if (countdown < 100) {
+    if (countdown < 300) {
+        if(voteLocked) return;
         if (playerObj.name == username) return;
         $('.crosshair').remove();
         let crosshair = jQuery('<div/>', {
-            "class": `crosshair`,
+            "class": `crosshair new-card`,
         }).appendTo(playerObj.cardElement);
-        guess = playerObj.name;
+        vote = playerObj.name;
     }
     // console.log(card)
+}
+function cardMousedOver(playerObj) {
+
 }
 
 
