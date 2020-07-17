@@ -11,6 +11,7 @@ let countdown = 300;
 let leader = false;
 let voteLocked = false;
 let vote = 'none';
+let myPlayer = undefined;
 
 $(document).ready(function () {
     socket = io.connect(SERVER);
@@ -37,11 +38,15 @@ function countDownClock() {
 
 function setRoles(playerData) {
     playerData.forEach(p => {
-        if (p.name == username) return;
         let localP = playerArray.find((localPlayer) => {
             return localPlayer.name == p.name;
         });
         console.log('Setting ' + localP.name + ' to ' + p.role);
+        // If player is client, don't reveal card
+        if (p.name == username) {
+            myPlayer.role = p.role;
+            return;
+        }
         localP.setRole(p.role);
     });
 }
@@ -92,6 +97,8 @@ function addPlayer(player) {
 
     card.appendTo(board);
     let playerObj = new Player(player.name, undefined, card, listItem);
+    if (options.item == 'good') myPlayer = playerObj;
+
     playerArray.push(playerObj);
 
     // Give cardElement events
@@ -104,20 +111,31 @@ function addPlayer(player) {
 }
 
 function startGame(playerData) {
-    setRoles(playerData);
+
     countDownClock();
     $('#game-start-message').css('top', '0');
     $('#game-start-message > h2').css('opacity', '1');
-    $('#clear-vote-button').css('display', 'flex');
-    $('#submit-vote-button').css('display', 'flex');
 
     setTimeout(() => {
+        setTimeout(() => { setRoles(playerData); }, 1000);
         $('#game-start-message').css('top', '100%');
+        $('#clear-vote-button').css('display', 'flex');
+        $('#submit-vote-button').css('display', 'flex');
     }, TITLE_ANIM_TIME);
+    // 
 }
 function endGame(winners) {
-    console.log(`${(winners)} won`);
-    countdown = 0;
+    setTimeout(() => {
+        myPlayer.setRole(myPlayer.role);
+        $('.game-start-content').hide();
+        $('.game-end-content').show(); 
+
+        setTimeout(() => { $('#game-start-message').css('top', '0'); }, 2000);
+    }, 1000)
+    if (winners) winners.forEach((winner) => { console.log(winner.name) })
+    else console.log('Everyone Lost');
+    myPlayer.cardElement.addClass('')
+    countdown = 1;
 }
 /*------------------------
         Button EVENTS
@@ -138,7 +156,7 @@ function lockVote() {
     if (!voteLocked) {
         voteLocked = true;
         $('#submit-vote-button').addClass('active');
-        socket.emit('submitVote', { name: username, vote: vote, room: room });
+        socket.emit('submitVote', { name: username, vote: vote, room: room }, endGame);
     }
 }
 
@@ -148,7 +166,7 @@ function lockVote() {
 function cardClicked(playerObj) {
     // if game started
     if (countdown < 300) {
-        if(voteLocked) return;
+        if (voteLocked) return;
         if (playerObj.name == username) return;
         $('.crosshair').remove();
         let crosshair = jQuery('<div/>', {
@@ -173,9 +191,12 @@ class Player {
     }
     setRole(role) {
         this.role = role;
+
         // animate adding the role
-        setTimeout(() => { this.cardElement.removeClass('hidden-card'); }, 200);
-        this.cardElement.addClass(role);
-        this.cardElement.addClass('reveal-card')
+        this.cardElement.addClass('reveal-card-' + role);
+        setTimeout(() => {
+            this.cardElement.addClass(role);
+            this.cardElement.removeClass('hidden-card');
+        }, 1000);
     }
 }

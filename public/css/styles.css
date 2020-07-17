@@ -172,7 +172,11 @@ body {
     /* display: none; */
     transition: opacity 1s;
 }
-
+.join-container{
+    width: 100%;
+    height: 80px;
+    
+}
 #table {
     position: absolute;
     border: solid black 3px;
@@ -225,6 +229,9 @@ body {
     transition: opacity 1.5s ease-in;
     opacity: 0;
 }
+.game-end-content {
+    display: none;
+}
 
 .slam {
     animation: slam-anim 1s ease-in;
@@ -249,6 +256,8 @@ body {
 
 .card:hover {
     transform: scale(1.1);
+    /* animation: reveal-card-anim 1s; */
+    /* background-image: url(../img/cards/robber.jpg); */
     cursor: pointer;
 }
 
@@ -337,16 +346,103 @@ body {
     animation: new-card-anim var(--anim-speed);
 }
 
-.reveal-card {
+.reveal-card-robber {
     /* transform: rotateY(180deg) scaleX(-1); */
-    /* animation: reveal-card-anim var(--anim-speed); */
+    animation: reveal-card-anim-robber 1s ;
+}
+.reveal-card-villager {
+    /* transform: rotateY(180deg) scaleX(-1); */
+    animation: reveal-card-anim-villager 1s ;
+}
+.reveal-card-wolf {
+    /* transform: rotateY(180deg) scaleX(-1); */
+    animation: reveal-card-anim-wolf 1s ;
+}
+.reveal-card-alpha {
+    /* transform: rotateY(180deg) scaleX(-1); */
+    animation: reveal-card-anim-alpha 1s ;
+}
+.reveal-card-tanner {
+    /* transform: rotateY(180deg) scaleX(-1); */
+    animation: reveal-card-anim-tanner 1s ;
 }
 
-@keyframes reveal-card-anim {
+@keyframes reveal-card-anim-robber {
+    0%{
+        left: 0px;
+    }
+    50%{
+        left: -75px;
+        transform: rotateY(-90deg) ;
+    }
     100% {
-        transform: rotateY(180deg);
+        left: 0px;
+        transform: rotateY(-180deg);     
+        background-image: url(../img/cards/robber_reflect.jpg);
+
     }
 }
+@keyframes reveal-card-anim-villager {
+    0%{
+        left: 0px;
+    }
+    50%{
+        left: -75px;
+        transform: rotateY(-90deg) ;
+    }
+    100% {
+        left: 0px;
+        transform: rotateY(-180deg);     
+        background-image: url(../img/cards/village_reflect.jpg);
+
+    }
+}
+@keyframes reveal-card-anim-wolf {
+    0%{
+        left: 0px;
+    }
+    50%{
+        left: -75px;
+        transform: rotateY(-90deg) ;
+    }
+    100% {
+        left: 0px;
+        transform: rotateY(-180deg);     
+        background-image: url(../img/cards/wolf_reflect.png);
+
+    }
+}
+@keyframes reveal-card-anim-alpha {
+    0%{
+        left: 0px;
+    }
+    50%{
+        left: -75px;
+        transform: rotateY(-90deg) ;
+    }
+    100% {
+        left: 0px;
+        transform: rotateY(-180deg);     
+        background-image: url(../img/cards/alpha_reflect.jpg);
+
+    }
+}
+@keyframes reveal-card-anim-tanner {
+    0%{
+        left: 0px;
+    }
+    50%{
+        left: -75px;
+        transform: rotateY(-90deg) ;
+    }
+    100% {
+        left: 0px;
+        transform: rotateY(-180deg);     
+        background-image: url(../img/cards/tanner_reflect.jpg);
+
+    }
+}
+
 
 @keyframes new-card-anim {
     0% {

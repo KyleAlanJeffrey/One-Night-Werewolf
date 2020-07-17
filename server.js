@@ -30,7 +30,8 @@ class Room {
     constructor() {
         this.players = [];
         this.leader = undefined;
-        this.roles = ['wolf', 'wolf', 'wolf', 'villager', 'villager', 'villager', 'alpha', 'robber', 'tanner'];
+        // this.roles = ['wolf', 'wolf', 'wolf', 'villager', 'villager', 'villager', 'alpha', 'robber', 'tanner'];
+        this.roles = ['wolf', 'wolf', 'wolf'];
         this.name = 'room ' + (rooms.length + 1);
         this.gameRunning = false;
         this.votesSubmitted = 0;
@@ -52,18 +53,20 @@ io.sockets.on('connection', (socket) => {
     });
 
     /*------------------ Vote Submission Event ------------------ */
-    socket.on('submitVote', (player) => {
+    socket.on('submitVote', (player, callback) => {
         console.log(`${player.name} voted against ${player.vote}`);
         let room = rooms.find(r => { return player.room == r.name; });
         room.votesSubmitted++;
         let serverPlayer = room.players.find(p => { return player.name == p.name; });
         serverPlayer.vote = room.players.find(p => { return player.vote == p.name; });
-
+        if (!serverPlayer.vote) serverPlayer.vote = { name: 'none', role: 'none' };
+        // console.log(serverPlayer.vote);
         // If everyone but one has submitted vote
-        if (room.votesSubmitted == room.players.length - 1) {
-            console.log(`Determing Winners in ${room.name}`);
+        if (room.votesSubmitted == room.players.length) {
+            console.log(`Determining Winners in ${room.name}`);
             let winners = determineWinners(room);
-            socket.emit('endGame', winners);
+            socket.to(room.name).emit('endGame', winners);
+            callback(winners);
         }
     })
 
@@ -106,13 +109,54 @@ function startGame(roomName) {
 function determineWinners(room) {
     let winners = [];
     let players = room.players;
-
-    for (let i = 0; i < players.length; i++) {
-        const player = players[i];
-        if (player.role == 'tanner') {
-            console.log('Tanner')
+    // Check if all villagers
+    let villagers = players.filter((player) => { return player.role == 'villager'; });
+    // Check if all Wolves
+    let wolves = players.filter((player) => { return player.role == 'wolf'; });
+    console.log(wolves)
+    // If everyone villagers, win condition is not voting
+    if (villagers.length == players.length) {
+        let win = villagers.every((villager) => { return villager.vote.name == 'none'; });
+        if (win) {
+            villagers.forEach(villager => { winners.push(villager); });
         }
+        return winners;
     }
+
+    // If everyone is a wolf, win condition is not voting
+    if (wolves.length == players.length) {
+        let win = wolves.every((wolf) => { return wolf.vote.name == 'none'; });
+        if (win) {
+            wolves.forEach(wolf => { winners.push(wolf); });
+        }
+        return winners;
+    }
+
+    // for (let i = 0; i < players.length; i++) {
+    //     const player = players[i];
+    //     console.log(`Player: ${player.name}, voted player ${player.vote.name}`);
+    //     // Tanner wins if votes for no one
+    //     if (player.role == 'tanner') {
+    //         if (player.vote == 'none') {
+    //             winners.push(player);
+    //             break;
+    //         } else {
+    //             let w = players.filter((p) => { return p.name != player && p.name != player.vote });
+    //             winners.push(w);
+    //             break;
+    //         }
+    //     }
+
+    //     else if (player.role == 'villager') {
+    //         if (player.vote == 'wolf') {
+
+    //         }
+    //     }
+    // }
     return winners;
 }
 
+function winnersFromLosers(losers, players) {
+    let winners = players.filter((p) => { return p.name != losers[0] && p.name != losers[1] });
+    return winners;
+}

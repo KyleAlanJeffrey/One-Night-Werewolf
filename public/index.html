@@ -28,16 +28,23 @@
                 <label for="usr">Name:</label>
                 <input type="text" class="form-control mx-3" id="usr">
             </div>
-            <button onclick="joinServer();" class="btn btn-md btn-success">Join Server</button>
+            <div class="join-container d-flex justify-content-center">
+                <a onclick="joinServer();" class="horizontal success">
+                    <span class="text"> Join Server </span>
+                </a>    
+            </div>
+            <!-- <button onclick="joinServer();" class="btn btn-md btn-success">Join Server</button> -->
         </div>
     </div>
     <div id='game-start-message' class="d-flex justify-content-center align-content-center flex-column">
-        <h1 class="mb-4">THE CLOCK STRIKES 12...</h1>
-        <h2>You Have 300 seconds</h2>
+        <h1 class="mb-4 game-start-content">THE CLOCK STRIKES 12...</h1>
+        <h2 class="game-start-content">You Have 300 seconds</h2>
+        <h1 class="mb-4 game-end-content"> () )() () Have Won.</h1>
+        <h2 class="game-end-content"> Daylight has returned.</h2>
     </div>
 
     <div class="container-fluid d-flex justify-content-center align-items-center" id="board">
-        <!-- <div class="card m-3 villager reveal-card">
+        <!-- <div class="card m-3 hidden-card reveal-card-villager">
             <div class="card-info d-flex align-items-center">
                 <span>
                     The Villager must vote all wolves out.
@@ -58,8 +65,8 @@
         </div> -->
     <!-- Lock Vote Button -->
     <div class="submisson-container d-flex justify-content-center align-items-end">
-        <a id="submit-vote-button" onclick="lockVote();" class="horizontal aqua" >
-            <span class="text" >
+        <a id="submit-vote-button" onclick="lockVote();" class="horizontal aqua">
+            <span class="text">
                 LOCK VOTE
             </span>
         </a>
@@ -68,7 +75,7 @@
                 Start Game
             </span>
         </a>
-        <a id="clear-vote-button" onclick="clearVote()" class="horizontal secondary">
+        <a id="clear-vote-button" onclick="clearVote()" class="horizontal secondary active">
             <span class="text">
                 No Vote
             </span>
