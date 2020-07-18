@@ -8,8 +8,10 @@
     --success-base-color: #65ff2d;
     --secondary-base-color: #efff0b;
     --hover-color: orange;
+    --good:#65ff2d;
+    --bad: rgb(255, 0, 0);
+    --lock: #efff0b;
 }
-
 body {
     font-family: 'Alegreya Sans', sans-serif;
     font-weight: 700;
@@ -20,33 +22,144 @@ body {
     user-select: none;
 }
 
+#join-game-overlay {
+    position: absolute;
+    z-index: 100;
+    background-color: black;
+    height: 100%;
+    width: 100%;
+    opacity: .9;
+    /* display: none; */
+    transition: opacity 1s;
+}
+.join-container{
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: center;    
+}
+#name-field{
+    font-size: x-large;
+    text-align: center;
+}
+#title{
+    font-size: 200px;
+}
+
+.flex-center-column{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
 .blur {
     backdrop-filter: blur(5px);
 }
 
-#taskbar {
+#user-list {
+    position: absolute;
+    opacity: .8;
+    font-size: x-large;
+    list-style: none;
+}
+
+.user.bad {
+    color: var(--red);
+}
+
+.user.good {
+    color: var(--green);
+}
+
+#settings-toolbar {
+    position: absolute;
+    width: 100%;
+    height: 200px;
+    top: 100%;
+    background-color: grey;
+    /* z-index: 1000; */
+    transition: .3s ease-in;
+}
+
+#table {
+    position: absolute;
+    border: solid black 3px;
+    z-index: -10;
+    background-color: red;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+#board {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     height: 100%;
     width: 100%;
 }
 
-/* ---------------
-        Buttons
-------------------*/
-#start-game-button {
+#countdown-clock {
+    position: absolute;
+    width: 100%;
+    z-index: 101;
     display: none;
 }
 
-#clear-vote-button {
+#timer {
     display: none;
 }
-#submit-vote-button{
+
+
+#game-start-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+    /* background-color: black; */
+    background-image: url(../img/bg/lightning2.gif);
+    background-size: cover;
+    transition: top 1s;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 100%;
+    text-align: center;
+    font-weight: 900;
+    font-style: italic;
+    color: red;
+}
+
+#game-start-message h1, h2 {
+    transform: scale(2);
+}
+
+#game-start-message h2 {
+    transition: opacity 1.5s ease-in;
+    opacity: 0;
+}
+.game-end-content {
     display: none;
 }
-.submisson-container {
+
+.slam {
+    animation: slam-anim 1s ease-in;
+}
+
+/* ---------------
+        Buttons
+------------------*/
+.taskbar {
     position: absolute;
     width: 100%;
     height: 95%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+.taskbar a{
+    display: none;
 }
 
 .horizontal {
@@ -132,117 +245,15 @@ body {
     transform: scale3d(1, 1, 1);
 }
 
-
 /* ---------------
          
 ------------------*/
-
-#user-list {
-    position: absolute;
-    opacity: .8;
-    font-size: x-large;
-    list-style: none;
-}
-
-.user.bad {
-    color: var(--red);
-}
-
-.user.good {
-    color: var(--green);
-}
-
-#settings-toolbar {
-    position: absolute;
-    width: 100%;
-    height: 200px;
-    top: 100%;
-    background-color: grey;
-    /* z-index: 1000; */
-    transition: .3s ease-in;
-}
-
-#join-game-overlay {
-    position: absolute;
-    z-index: 100;
-    background-color: black;
-    height: 100%;
-    width: 100%;
-    opacity: .9;
-    /* display: none; */
-    transition: opacity 1s;
-}
-.join-container{
-    width: 100%;
-    height: 80px;
-    
-}
-#table {
-    position: absolute;
-    border: solid black 3px;
-    z-index: -10;
-    background-color: red;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-}
-
-#board {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-}
-
-#countdown-clock {
-    position: absolute;
-    width: 100%;
-    z-index: 101;
-    display: none;
-}
-
-#timer {
-    display: none;
-}
-
-
-#game-start-message {
-    z-index: 1000;
-    /* background-color: black; */
-    background-image: url(../img/bg/lightning2.gif);
-    background-size: cover;
-    transition: top 1s;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 100%;
-    text-align: center;
-    font-weight: 900;
-    font-style: italic;
-    color: red;
-}
-
-#game-start-message h1, h2 {
-    transform: scale(2);
-}
-
-#game-start-message h2 {
-    transition: opacity 1.5s ease-in;
-    opacity: 0;
-}
-.game-end-content {
-    display: none;
-}
-
-.slam {
-    animation: slam-anim 1s ease-in;
-}
 
 /*--------------------
         CARDS
  ---------------------*/
 
 /* Card Aspect Ratio: 1.4 */
-
 .card {
     width: 150px;
     height: 210px;
@@ -280,61 +291,48 @@ body {
     width: 250px;
     height: 310px;
 }
-
-.card-info {
+.card .locked{
+    animation: lock-card-anim .3s, glowing-anim 3s infinite;
     position: absolute;
+    background-image: url(../img/cards/lock.png);
+    background-size: cover;
     height: 100%;
     width: 100%;
-    user-select: none;
-    opacity: 0;
-    border-radius: 15px;
-    background-color: rgb(0, 0, 0);
-    transition: var(--anim-speed);
-    color: white;
 }
-
-.card-info span {
-    position: relative;
-    top: 0;
-    font-size: large;
+@keyframes glowing-anim{
+    0% { box-shadow: 0 0 -10px var(--lock); }
+    40% { box-shadow: 0 0 20px var(--lock); }
+    60% { box-shadow: 0 0 20px var(--lock); }
+    100% { box-shadow: 0 0 -10px var(--lock); }
 }
-
-.card-info:hover {
-    opacity: .9;
-}
-
-/* .card-info button{
-    position: absolute;
-    border-radius: 5px;
-    font-size: large;
-    left: 3px;
-    top: 85%;
-
-} */
-
 .villager {
     background-image: url(../img/cards/villager.jpg);
-    color: green;
+    box-shadow: 0 0 20px var(--good);
+    color: var(--good);
 }
 
 .wolf {
     background-image: url(../img/cards/wolf.png);
-    color: red;
+    box-shadow: 0 0 20px var(--bad);
+    color: var(--bad);
 }
 
 .tanner {
     background-image: url(../img/cards/tanner.jpg);
+    box-shadow: 0 0 20px gold;
     color: gold;
 }
 
 .robber {
     background-image: url(../img/cards/robber.jpg);
-    color: green;
+    box-shadow: 0 0 20px var(--good);
+    color: var(--good);
 }
 
 .alpha {
     background-image: url(../img/cards/alpha.jpg);
-    color: red;
+    box-shadow: 0 0 20px var(--bad);
+    color: var(--bad);
 }
 
 .hidden-card {
@@ -456,9 +454,9 @@ body {
     }
 }
 
-@keyframes slam-anim {
+@keyframes lock-card-anim {
     0% {
-        transform: scale(4);
+        transform: scale(2);
     }
     75% {
         transform: scale(.8);

@@ -10,61 +10,48 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 
-<body class="">
-    <div id="settings-toolbar">
-        <button type="button" name="" id="" class="btn btn-lg btn-success"></button>
-        <button type="button" name="" id="" class="btn btn-lg btn-primary"></button>
-        <button type="button" name="" id="" class="btn btn-lg btn-primary"></button>
-    </div>
+<body>
 
     <div id='countdown-clock' class="d-flex text-danger justify-content-center p-3">
         <h1 id="timer">TIME: 300</h1>
     </div>
 
+    <!-- Entrance Content -->
     <div id="join-game-overlay">
-        <div class="d-flex text-white justify-content-center align-items-center flex-column" style="height: 100%;">
-            <h1>ONE NIGHT WEREWOLF</h1>
+        <div class="text-danger flex-center-column" style="height: 100%;">
+            <h1 id="title">Midnight</h1>
+            <h2 class="text-success" style="font-size: large;">Name:</h2>
             <div class="form-inline my-2">
-                <label for="usr">Name:</label>
-                <input type="text" class="form-control mx-3" id="usr">
+                <input type="text" class="form-control py-4 px-5 mx-4" id="name-field">
             </div>
-            <div class="join-container d-flex justify-content-center">
+            <div class="join-container">
                 <a onclick="joinServer();" class="horizontal success">
                     <span class="text"> Join Server </span>
                 </a>    
             </div>
-            <!-- <button onclick="joinServer();" class="btn btn-md btn-success">Join Server</button> -->
         </div>
     </div>
-    <div id='game-start-message' class="d-flex justify-content-center align-content-center flex-column">
+
+    <!-- Sliding Up Message Board -->
+    <div id='game-start-message'>
         <h1 class="mb-4 game-start-content">THE CLOCK STRIKES 12...</h1>
         <h2 class="game-start-content">You Have 300 seconds</h2>
-        <h1 class="mb-4 game-end-content"> () )() () Have Won.</h1>
-        <h2 class="game-end-content"> Daylight has returned.</h2>
+        <h1 class="mb-4 game-end-content"> Have Won.</h1>
+        <!-- <h2 class="game-end-content"> Daylight has returned.</h2> -->
     </div>
 
-    <div class="container-fluid d-flex justify-content-center align-items-center" id="board">
-        <!-- <div class="card m-3 hidden-card reveal-card-villager">
-            <div class="card-info d-flex align-items-center">
-                <span>
-                    The Villager must vote all wolves out.
-                </span>
-            </div>
+    <!-- Cards Go Here -->
+    <div class="container-fluid" id="board">
+        <!-- <div class="card m-3 villager locked">
+            <div class="locked"></div>
             <span>User 69</span>
         </div> -->
-
-
     </div>
-    <!-- User List -->
+    
     <ul class="bg-dark text-white px-4 py-0" id="user-list"></ul>
 
-    <!-- <div id="taskbar" class="container-fluid d-inline-flex align-items-end justify-content-center p-3">
-            <button id="clear-vote-button" class='btn btn-warning btn-lg' onclick="clearVote()">No Vote</button>
-            <button id="start-game-button" class="btn btn-success btn-lg" onclick="hostRequestStart()">Start
-                Game</button>
-        </div> -->
-    <!-- Lock Vote Button -->
-    <div class="submisson-container d-flex justify-content-center align-items-end">
+    <!-- Taskbar -->
+    <div class="taskbar">
         <a id="submit-vote-button" onclick="lockVote();" class="horizontal aqua">
             <span class="text">
                 LOCK VOTE

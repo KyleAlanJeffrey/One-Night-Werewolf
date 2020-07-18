@@ -11,11 +11,12 @@ let countdown = 300;
 let leader = false;
 let voteLocked = false;
 let vote = 'none';
+let voteRoll = 'none';
 let myPlayer = undefined;
 
 $(document).ready(function () {
     socket = io.connect(SERVER);
-    $('#usr').val('User ' + Math.floor(100 * Math.random()));
+    $('#name-field').val('User ' + Math.floor(100 * Math.random()));
     board = $('#board');
     userList = $('#user-list');
     socket.on('newPlayer', addPlayer);
@@ -54,7 +55,7 @@ function setRoles(playerData) {
         Socket EVENTS
 -------------------------*/
 function joinServer() {
-    username = $('#usr').val();
+    username = $('#name-field').val();
     socket.emit('join', { name: username, }, (data, lead, roomName) => {
         if (lead) {
             $('#start-game-button').css('display', 'flex');
@@ -80,30 +81,17 @@ function addPlayer(player) {
         options.item = 'good';
     }
     if (player.leader) options.host = ' (host)';
-    // Add player to playerlist
-    let listItem = jQuery('<li/>', {
-        "class": `user ${options.item}`,
-        'text': player.name + options.host,
-    });
-    listItem.appendTo(userList);
-
-    // Add player card to board
-    let card = jQuery('<div/>', {
-        "class": 'card hidden-card m-3 new-card',
-    });
-    jQuery('<span/>', {
-        "text": player.name,
-    }).appendTo(card);
-
-    card.appendTo(board);
+    
     let playerObj = new Player(player.name, undefined, card, listItem);
+    
+    playerObj.createCardElement(options);
+    playerObj.createListElement(options);
     if (options.item == 'good') myPlayer = playerObj;
-
     playerArray.push(playerObj);
 
     // Give cardElement events
-    card.on('click', () => { cardClicked(playerObj); });
-    card.on('onmouseover', () => { cardMousedOver(playerObj); });
+    playerObj.cardElement.on('click', () => { cardClicked(playerObj); });
+    playerObj.cardElement.on('onmouseover', () => { cardMousedOver(playerObj); });
 
     setTimeout(() => {
         $('.new-card').removeClass('new-card');
@@ -121,19 +109,32 @@ function startGame(playerData) {
         $('#game-start-message').css('top', '100%');
         $('#clear-vote-button').css('display', 'flex');
         $('#submit-vote-button').css('display', 'flex');
-    }, TITLE_ANIM_TIME);
-    // 
+    }, 1);
+    // TITLE_ANIM_TIME
 }
 function endGame(winners) {
     setTimeout(() => {
+        // Reveal Card
         myPlayer.setRole(myPlayer.role);
         $('.game-start-content').hide();
-        $('.game-end-content').show(); 
 
+        let text = ' Won!';
+        if (winners[0]) {
+            let t = '';
+            winners.forEach((winner) => { t += winner.name + ', ' });
+            text = t + text;
+        }
+        else {
+            text = 'Everyone Lost!';
+        }
+        console.log(text);
+        // Print winners.
+        $('.game-end-content').text(text);
+        $('.game-end-content').show();
+
+        // Slide title screen back up. 
         setTimeout(() => { $('#game-start-message').css('top', '0'); }, 2000);
     }, 1000)
-    if (winners) winners.forEach((winner) => { console.log(winner.name) })
-    else console.log('Everyone Lost');
     myPlayer.cardElement.addClass('')
     countdown = 1;
 }
@@ -156,7 +157,7 @@ function lockVote() {
     if (!voteLocked) {
         voteLocked = true;
         $('#submit-vote-button').addClass('active');
-        socket.emit('submitVote', { name: username, vote: vote, room: room }, endGame);
+        socket.emit('submitVote', { name: username, vote: vote, voteRoll: voteRoll, room: room }, endGame);
     }
 }
 
@@ -173,6 +174,7 @@ function cardClicked(playerObj) {
             "class": `crosshair new-card`,
         }).appendTo(playerObj.cardElement);
         vote = playerObj.name;
+        voteRoll = playerObj.role;
     }
     // console.log(card)
 }
@@ -191,12 +193,33 @@ class Player {
     }
     setRole(role) {
         this.role = role;
-
         // animate adding the role
         this.cardElement.addClass('reveal-card-' + role);
         setTimeout(() => {
             this.cardElement.addClass(role);
             this.cardElement.removeClass('hidden-card');
         }, 1000);
+    }
+    createCardElement(options) {
+
+        // Add player card to board
+        let card = jQuery('<div/>', {
+            "class": 'card hidden-card m-3 new-card',
+        });
+        // Username 
+        jQuery('<span/>', {
+            "text": this.name,
+        }).appendTo(card);
+    
+        card.appendTo(board);
+
+    }
+    createListElement(player, options) {
+        let listItem = jQuery('<li/>', {
+            "class": `user ${options.item}`,
+            'text': player.name + options.host,
+        });
+        listItem.appendTo(userList);
+
     }
 }

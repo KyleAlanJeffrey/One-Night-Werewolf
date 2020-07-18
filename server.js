@@ -25,16 +25,68 @@ class Player {
         this.vote = undefined;
         this.leader = lead; // bool
     }
+    swapRole() {
+        if (this.role == 'wolf') this.role = 'villager'
+        else if (this.role == 'villager') this.role = 'wolf';
+    }
+    print() {
+        let string = `Player: ${this.name} Role: ${this.role}`;
+        console.log(string);
+        return string;
+    }
 }
 class Room {
     constructor() {
         this.players = [];
         this.leader = undefined;
         // this.roles = ['wolf', 'wolf', 'wolf', 'villager', 'villager', 'villager', 'alpha', 'robber', 'tanner'];
-        this.roles = ['wolf', 'wolf', 'wolf'];
+        this.roles = ['wolf', 'villager', 'alpha'];
         this.name = 'room ' + (rooms.length + 1);
         this.gameRunning = false;
         this.votesSubmitted = 0;
+    }
+    submitVote(playerData) {
+        this.votesSubmitted++;
+        let serverPlayerObject = this.players.find(player => { return playerData.name == player.name; });
+        if (playerData.vote == 'none') serverPlayerObject.vote = { name: 'none', roll: 'none' };
+        else { serverPlayerObject.vote = { name: playerData.vote, roll: playerData.voteRoll } };
+        console.log(serverPlayerObject.vote);
+
+    }
+    allVotesSubmitted() {
+        if (this.players.length == this.votesSubmitted) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    everyOtherPlayer(player) {
+        return this.players.filter((p) => { return p.name != player.name });
+    }
+    findPlayer(name) {
+        return this.players.find((p) => { return p.name == name });
+    }
+    alphaSwap(alpha) {
+        this.print();
+        let others = this.everyOtherPlayer(alpha);
+        alpha.role = 'wolf';
+        others.forEach((player) => { player.swapRole(); });
+        this.print();
+    }
+    robberSwap(robber){
+        this.print();
+        let others = this.everyOtherPlayer(robber);
+        robber.role = 'villager';
+        others.forEach((player) => { player.swapRole(); });
+        this.print();
+
+    }
+    print() {
+        console.log(this.name + '\n---------------');
+        this.players.forEach((player) => {
+            player.print();
+        });
+        console.log('\n');
     }
 }
 const rooms = [];
@@ -53,16 +105,12 @@ io.sockets.on('connection', (socket) => {
     });
 
     /*------------------ Vote Submission Event ------------------ */
-    socket.on('submitVote', (player, callback) => {
-        console.log(`${player.name} voted against ${player.vote}`);
-        let room = rooms.find(r => { return player.room == r.name; });
-        room.votesSubmitted++;
-        let serverPlayer = room.players.find(p => { return player.name == p.name; });
-        serverPlayer.vote = room.players.find(p => { return player.vote == p.name; });
-        if (!serverPlayer.vote) serverPlayer.vote = { name: 'none', role: 'none' };
-        // console.log(serverPlayer.vote);
-        // If everyone but one has submitted vote
-        if (room.votesSubmitted == room.players.length) {
+    socket.on('submitVote', (playerData, callback) => {
+        console.log(`${playerData.name} voted against ${playerData.vote}`);
+        let room = rooms.find(r => { return playerData.room == r.name; });
+        room.submitVote(playerData);
+
+        if (room.allVotesSubmitted()) {
             console.log(`Determining Winners in ${room.name}`);
             let winners = determineWinners(room);
             socket.to(room.name).emit('endGame', winners);
@@ -89,7 +137,7 @@ io.sockets.on('connection', (socket) => {
         socket.to(room.name).emit('newPlayer', player); // Alert other players in room of new player
         sendPlayers(players, leader, room.name);
 
-        console.log(data.name + ' joined ' + room.name);
+        console.log('-------' + data.name + ' joined ' + room.name+ '-------');
     });
 });
 
@@ -109,12 +157,66 @@ function startGame(roomName) {
 function determineWinners(room) {
     let winners = [];
     let players = room.players;
+
+
+    let allWolves = true;
+    let allVillagers = true;
+    let votes = [];
+    for (let i = 0; i < players.length; i++) {
+        const player = players[i];
+        votes.push(player.vote);
+
+        switch (player.role) {
+            case ('villager'): {
+                allWolves = false;
+                break;
+            }
+            case ('wolf'): {
+                allVillagers = false;
+                break;
+            }
+            case ('alpha'): {
+                alpha = true;
+                room.alphaSwap(player);
+                break;
+            }
+            case ('robber'): {
+                robber = true;
+                room.robberSwap(player);
+                break;
+            }
+            // Tanner
+            case ('tanner'): {
+                winners = [];
+                if (player.vote.name == 'none') {
+                    winners.push(player);
+                } else {
+                    let w = players.find((p) => { return p.name != tanner.name && p.name != tanner.vote.name });
+                    winners.push(w);
+                }
+                break;
+            }
+        }
+    }
+    return winners;
+    // Turn everyone into either villager or wolf
+
+
+    // Check who was killed
+    // killed = person with most votes/ if no most votes
+
+    // if nobody killed minority wins. 
+
+    // If person killed is wolf, villagers win
+
+    // else if villager is killed, wolves win
+
+
+
+
+    // If everyone villagers, win condition is not voting
     // Check if all villagers
     let villagers = players.filter((player) => { return player.role == 'villager'; });
-    // Check if all Wolves
-    let wolves = players.filter((player) => { return player.role == 'wolf'; });
-    console.log(wolves)
-    // If everyone villagers, win condition is not voting
     if (villagers.length == players.length) {
         let win = villagers.every((villager) => { return villager.vote.name == 'none'; });
         if (win) {
@@ -124,11 +226,14 @@ function determineWinners(room) {
     }
 
     // If everyone is a wolf, win condition is not voting
+    // Check if all Wolves
+    let wolves = players.filter((player) => { return player.role == 'wolf'; });
     if (wolves.length == players.length) {
         let win = wolves.every((wolf) => { return wolf.vote.name == 'none'; });
         if (win) {
             wolves.forEach(wolf => { winners.push(wolf); });
         }
+        console.log(winners);
         return winners;
     }
 
