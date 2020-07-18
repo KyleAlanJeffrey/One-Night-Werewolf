@@ -109,7 +109,7 @@ function startGame(playerData) {
         $('#game-start-message').css('top', '100%');
         $('#clear-vote-button').css('display', 'flex');
         $('#submit-vote-button').css('display', 'flex');
-    }, 1);
+    }, TITLE_ANIM_TIME);
     // TITLE_ANIM_TIME
 }
 function endGame(winners) {
