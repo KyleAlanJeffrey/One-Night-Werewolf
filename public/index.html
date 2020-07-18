@@ -12,7 +12,7 @@
 
 <body>
 
-    <div id='countdown-clock' class="d-flex text-danger justify-content-center p-3">
+    <div id='countdown-clock' class="d-flex text-danger align-content-end justify-content-center py-5">
         <h1 id="timer">TIME: 300</h1>
     </div>
 
@@ -27,11 +27,23 @@
             <div class="join-container">
                 <a onclick="joinServer();" class="horizontal success">
                     <span class="text"> Join Server </span>
-                </a>    
+                </a>
             </div>
         </div>
     </div>
 
+    <!-- Server Browser -->
+    <div id="server-browser" class="">
+        <div class="sticky">
+            <span onmousedown="serverBrowserClicked()" class="px-3 py-1 drop-shadow">Server Browser</span>
+        </div>
+            <div class="container server-list">
+                <h1 class="title drop-shadow">Servers</h1>
+                <div class="item p-2"> Server 1: Players: 2/3</div>
+                <div class="item"> Server 1: Players: 2/3</div>
+                <div class="item"> Server 1: Players: 2/3</div>
+        </div>
+    </div>
     <!-- Sliding Up Message Board -->
     <div id='game-start-message'>
         <h1 class="mb-4 game-start-content">THE CLOCK STRIKES 12...</h1>
@@ -47,7 +59,7 @@
             <span>User 69</span>
         </div> -->
     </div>
-    
+
     <ul class="bg-dark text-white px-4 py-0" id="user-list"></ul>
 
     <!-- Taskbar -->

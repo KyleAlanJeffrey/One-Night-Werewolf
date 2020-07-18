@@ -8,10 +8,13 @@
     --success-base-color: #65ff2d;
     --secondary-base-color: #efff0b;
     --hover-color: orange;
-    --good:#65ff2d;
+    --good: #65ff2d;
     --bad: rgb(255, 0, 0);
     --lock: #efff0b;
+    --title-primary: red;
+    --title-secondary: rgb(128, 0, 0);
 }
+
 body {
     font-family: 'Alegreya Sans', sans-serif;
     font-weight: 700;
@@ -22,6 +25,80 @@ body {
     user-select: none;
 }
 
+/* ------------------------
+        Custom Settings
+-------------------------*/
+
+.drop-shadow {
+    text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--good), 0 0 40px var(--good), 0 0 50px var(--good), 0 0 60px var(--good), 0 0 70px var(--good);
+}
+
+/* ------------------------
+        Overlays
+-------------------------*/
+.server-list{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    color: var(--good);
+
+}
+.server-list .title{
+    font-size: 100px;
+    color: var(--bad);
+    animation: glowing-font-anim 4s ease-in-out infinite alternate;
+
+}
+.server-list .item{
+    width: 100%;
+    height: 10%;
+    border: var(--bad) solid 3px;
+    border-radius: 5px;
+    font-size: x-large;
+    margin: 8px 0;
+
+}
+#server-browser {
+    position: absolute;
+    background-color: black;
+    height: 100%;
+    width: 100%;
+    z-index: 200;
+    top: -100%;
+    transition: top 1s ease-in-out;
+}
+
+#server-browser.active {
+    top: 0%;
+}
+#server-browser .sticky {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    top: 99vh;
+    width: 100%;
+    transition: 2s ease-in-out;
+}
+#server-browser .sticky span {
+    border: var(--good) solid 3px;
+    border-radius: 0px 0px 20px 20px;
+    color: var(--good);
+    animation: flashing-anim 3s ease-in-out infinite alternate;
+    transition: 2s ease-in-out;
+}
+#server-browser .sticky span:hover {
+    cursor: pointer;
+    animation: none;
+}
+#server-browser.active .sticky {
+    top: 96%;
+}
+#server-browser.active .sticky span{
+    border-radius: 20px 20px 0px 0px;
+}
 #join-game-overlay {
     position: absolute;
     z-index: 100;
@@ -32,26 +109,64 @@ body {
     /* display: none; */
     transition: opacity 1s;
 }
-.join-container{
+
+.join-container {
     width: 100%;
     height: 80px;
     display: flex;
-    justify-content: center;    
+    justify-content: center;
 }
-#name-field{
+
+#game-start-message {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1000;
+    /* background-color: black; */
+    background-image: url(../img/bg/lightning2.gif);
+    background-size: cover;
+    transition: top 1s;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 100%;
+    text-align: center;
+    font-weight: 900;
+    font-style: italic;
+    color: red;
+}
+
+#game-start-message h1, h2 {
+    transform: scale(2);
+}
+
+#game-start-message h2 {
+    transition: opacity 1.5s ease-in;
+    opacity: 0;
+}
+
+.game-end-content {
+    display: none;
+}
+
+#name-field {
     font-size: x-large;
     text-align: center;
 }
-#title{
+
+#title {
     font-size: 200px;
+    animation: glowing-font-anim 4s ease-in-out infinite alternate;
 }
 
-.flex-center-column{
+.flex-center-column {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
 }
+
 .blur {
     backdrop-filter: blur(5px);
 }
@@ -90,6 +205,7 @@ body {
     height: 100%;
     border-radius: 50%;
 }
+
 #board {
     display: flex;
     justify-content: center;
@@ -104,42 +220,10 @@ body {
     width: 100%;
     z-index: 101;
     display: none;
+    justify-content: center;
 }
 
 #timer {
-    display: none;
-}
-
-
-#game-start-message {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 1000;
-    /* background-color: black; */
-    background-image: url(../img/bg/lightning2.gif);
-    background-size: cover;
-    transition: top 1s;
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    top: 100%;
-    text-align: center;
-    font-weight: 900;
-    font-style: italic;
-    color: red;
-}
-
-#game-start-message h1, h2 {
-    transform: scale(2);
-}
-
-#game-start-message h2 {
-    transition: opacity 1.5s ease-in;
-    opacity: 0;
-}
-.game-end-content {
     display: none;
 }
 
@@ -150,6 +234,7 @@ body {
 /* ---------------
         Buttons
 ------------------*/
+
 .taskbar {
     position: absolute;
     width: 100%;
@@ -158,7 +243,8 @@ body {
     justify-content: center;
     align-items: flex-end;
 }
-.taskbar a{
+
+.taskbar a {
     display: none;
 }
 
@@ -179,9 +265,11 @@ body {
 .horizontal.aqua {
     border: 7px solid var(--aqua-base-color);
 }
+
 .horizontal.success {
     border: 7px solid var(--success-base-color);
 }
+
 .horizontal.secondary {
     border: 7px solid var(--secondary-base-color);
 }
@@ -200,9 +288,11 @@ body {
 .horizontal.aqua .text {
     background-image: linear-gradient( 90deg, var(--hover-color) 0%, var(--hover-color) 50%, var(--aqua-base-color) 50%, var(--aqua-base-color) 100%);
 }
+
 .horizontal.success .text {
     background-image: linear-gradient( 90deg, var(--hover-color) 0%, var(--hover-color) 50%, var(--success-base-color) 50%, var(--success-base-color) 100%);
 }
+
 .horizontal.secondary .text {
     background-image: linear-gradient( 90deg, var(--hover-color) 0%, var(--hover-color) 50%, var(--secondary-base-color) 50%, var(--secondary-base-color) 100%);
 }
@@ -222,9 +312,11 @@ body {
 .horizontal.aqua::before {
     background: var(--aqua-base-color);
 }
+
 .horizontal.success::before {
     background: var(--success-base-color);
 }
+
 .horizontal.secondary::before {
     background: var(--secondary-base-color);
 }
@@ -237,9 +329,11 @@ body {
     transform-origin: 0 0;
     transform: scale3d(1, 1, 1);
 }
-.horizontal.active .text{
+
+.horizontal.active .text {
     background-position: 0 0;
 }
+
 .horizontal.active::before {
     transform-origin: 0 0;
     transform: scale3d(1, 1, 1);
@@ -254,6 +348,7 @@ body {
  ---------------------*/
 
 /* Card Aspect Ratio: 1.4 */
+
 .card {
     width: 150px;
     height: 210px;
@@ -291,20 +386,32 @@ body {
     width: 250px;
     height: 310px;
 }
-.card .locked{
-    animation: lock-card-anim .3s, glowing-anim 3s infinite;
+
+.card .locked {
+    animation: name duration timing-function delay iteration-count direction fill-mode;
+    animation: lock-card-anim .5s ease-out, glowing-anim 3s infinite .5s;
     position: absolute;
     background-image: url(../img/cards/lock.png);
     background-size: cover;
     height: 100%;
     width: 100%;
 }
-@keyframes glowing-anim{
-    0% { box-shadow: 0 0 -10px var(--lock); }
-    40% { box-shadow: 0 0 20px var(--lock); }
-    60% { box-shadow: 0 0 20px var(--lock); }
-    100% { box-shadow: 0 0 -10px var(--lock); }
+
+@keyframes glowing-anim {
+    0% {
+        box-shadow: 0 0 -10px var(--lock);
+    }
+    40% {
+        box-shadow: 0 0 20px var(--lock);
+    }
+    60% {
+        box-shadow: 0 0 20px var(--lock);
+    }
+    100% {
+        box-shadow: 0 0 -10px var(--lock);
+    }
 }
+
 .villager {
     background-image: url(../img/cards/villager.jpg);
     box-shadow: 0 0 20px var(--good);
@@ -346,101 +453,103 @@ body {
 
 .reveal-card-robber {
     /* transform: rotateY(180deg) scaleX(-1); */
-    animation: reveal-card-anim-robber 1s ;
+    animation: reveal-card-anim-robber 1s;
 }
+
 .reveal-card-villager {
     /* transform: rotateY(180deg) scaleX(-1); */
-    animation: reveal-card-anim-villager 1s ;
+    animation: reveal-card-anim-villager 1s;
 }
+
 .reveal-card-wolf {
     /* transform: rotateY(180deg) scaleX(-1); */
-    animation: reveal-card-anim-wolf 1s ;
+    animation: reveal-card-anim-wolf 1s;
 }
+
 .reveal-card-alpha {
     /* transform: rotateY(180deg) scaleX(-1); */
-    animation: reveal-card-anim-alpha 1s ;
+    animation: reveal-card-anim-alpha 1s;
 }
+
 .reveal-card-tanner {
     /* transform: rotateY(180deg) scaleX(-1); */
-    animation: reveal-card-anim-tanner 1s ;
+    animation: reveal-card-anim-tanner 1s;
 }
 
 @keyframes reveal-card-anim-robber {
-    0%{
+    0% {
         left: 0px;
     }
-    50%{
+    50% {
         left: -75px;
-        transform: rotateY(-90deg) ;
+        transform: rotateY(-90deg);
     }
     100% {
         left: 0px;
-        transform: rotateY(-180deg);     
+        transform: rotateY(-180deg);
         background-image: url(../img/cards/robber_reflect.jpg);
-
     }
 }
+
 @keyframes reveal-card-anim-villager {
-    0%{
+    0% {
         left: 0px;
     }
-    50%{
+    50% {
         left: -75px;
-        transform: rotateY(-90deg) ;
+        transform: rotateY(-90deg);
     }
     100% {
         left: 0px;
-        transform: rotateY(-180deg);     
+        transform: rotateY(-180deg);
         background-image: url(../img/cards/village_reflect.jpg);
-
     }
 }
+
 @keyframes reveal-card-anim-wolf {
-    0%{
+    0% {
         left: 0px;
     }
-    50%{
+    50% {
         left: -75px;
-        transform: rotateY(-90deg) ;
+        transform: rotateY(-90deg);
     }
     100% {
         left: 0px;
-        transform: rotateY(-180deg);     
+        transform: rotateY(-180deg);
         background-image: url(../img/cards/wolf_reflect.png);
-
     }
 }
+
 @keyframes reveal-card-anim-alpha {
-    0%{
+    0% {
         left: 0px;
     }
-    50%{
+    50% {
         left: -75px;
-        transform: rotateY(-90deg) ;
+        transform: rotateY(-90deg);
     }
     100% {
         left: 0px;
-        transform: rotateY(-180deg);     
+        transform: rotateY(-180deg);
         background-image: url(../img/cards/alpha_reflect.jpg);
-
     }
 }
+
 @keyframes reveal-card-anim-tanner {
-    0%{
+    0% {
         left: 0px;
     }
-    50%{
+    50% {
         left: -75px;
-        transform: rotateY(-90deg) ;
+        transform: rotateY(-90deg);
     }
     100% {
         left: 0px;
-        transform: rotateY(-180deg);     
+        transform: rotateY(-180deg);
         background-image: url(../img/cards/tanner_reflect.jpg);
-
     }
 }
-
 
 @keyframes new-card-anim {
     0% {
@@ -456,12 +565,27 @@ body {
 
 @keyframes lock-card-anim {
     0% {
-        transform: scale(2);
+        transform: scale(.2);
     }
     75% {
-        transform: scale(.8);
+        transform: scale(1.2);
     }
     100% {
         transform: scale(1);
+    }
+}
+
+@keyframes glowing-font-anim {
+    from {
+        text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--title-primary), 0 0 40px var(--title-primary), 0 0 50px var(--title-primary), 0 0 60px var(--title-primary), 0 0 70px var(--title-primary);
+    }
+    to {
+        text-shadow: 0 0 20px #fff, 0 0 30px var(--title-secondary), 0 0 40px var(--title-secondary), 0 0 50px var(--title-secondary), 0 0 60px var(--title-secondary), 0 0 70px var(--title-secondary), 0 0 80px var(--title-secondary);
+    }
+}
+
+@keyframes flashing-anim {
+    to {
+        opacity: 0;
     }
 }

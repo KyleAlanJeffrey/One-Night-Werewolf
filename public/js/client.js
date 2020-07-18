@@ -16,11 +16,12 @@ let myPlayer = undefined;
 
 $(document).ready(function () {
     socket = io.connect(SERVER);
-    $('#name-field').val('User ' + Math.floor(100 * Math.random()));
+    $('#name-field').val('Gentleman ' + Math.floor(100 * Math.random()));
     board = $('#board');
     userList = $('#user-list');
     socket.on('newPlayer', addPlayer);
     socket.on('startGame', startGame);
+    socket.on('playerLocked', otherPlayerLocked);
     socket.on('endGame', endGame);
     // preload();
 });
@@ -99,7 +100,6 @@ function addPlayer(player) {
 }
 
 function startGame(playerData) {
-
     countDownClock();
     $('#game-start-message').css('top', '0');
     $('#game-start-message > h2').css('opacity', '1');
@@ -111,6 +111,11 @@ function startGame(playerData) {
         $('#submit-vote-button').css('display', 'flex');
     }, TITLE_ANIM_TIME);
     // TITLE_ANIM_TIME
+}
+
+function otherPlayerLocked(playerData) {
+    let lockedPlayer = playerArray.find((player) => { return playerData.name == player.name });
+    lockedPlayer.lock();
 }
 function endGame(winners) {
     setTimeout(() => {
@@ -133,7 +138,7 @@ function endGame(winners) {
         $('.game-end-content').show();
 
         // Slide title screen back up. 
-        setTimeout(() => { $('#game-start-message').css('top', '0'); }, 2000);
+        setTimeout(() => { $('#game-start-message').css('top', '0'); }, 3500);
     }, 1000)
     myPlayer.cardElement.addClass('')
     countdown = 1;
@@ -142,6 +147,8 @@ function endGame(winners) {
         Button EVENTS
 -------------------------*/
 function hostRequestStart() {
+    // Need at least three players to start
+    // if(playerArray.length < 3) return;
     socket.emit('hostStartRequest', room, (playerData) => {
         startGame(playerData);
     });
@@ -149,6 +156,7 @@ function hostRequestStart() {
 }
 function clearVote() {
     if (voteLocked) return;
+    if (guess == 'none') return;
     guess = 'none';
     $('#clear-vote-button').toggleClass('active');
     $('.crosshair').remove();
@@ -157,14 +165,13 @@ function lockVote() {
     if (!voteLocked) {
         voteLocked = true;
         $('#submit-vote-button').addClass('active');
-        let crosshair = jQuery('<div/>', {
-            "class": `locked`,
-        }).appendTo(myPlayer.cardElement);
-
+        myPlayer.lock();
         socket.emit('submitVote', { name: username, vote: vote, voteRoll: voteRoll, room: room }, endGame);
     }
 }
-
+function serverBrowserClicked() {
+    $('#server-browser').toggleClass('active');
+}
 /*------------------------
         CARD EVENTS
 -------------------------*/
@@ -208,7 +215,7 @@ class Player {
 
         // Add player card to board
         let card = jQuery('<div/>', {
-            "class": 'card hidden-card m-3 new-card',
+            "class": 'card hidden-card my-3 mx-5 new-card',
         });
         // Username 
         jQuery('<span/>', {
@@ -227,5 +234,10 @@ class Player {
         this.listElement = listItem;
         listItem.appendTo(userList);
 
+    }
+    lock() {
+        let lock = jQuery('<div/>', {
+            "class": `locked`,
+        }).appendTo(this.cardElement);
     }
 }

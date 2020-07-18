@@ -51,8 +51,6 @@ class Room {
         let serverPlayerObject = this.players.find(player => { return playerData.name == player.name; });
         if (playerData.vote == 'none') serverPlayerObject.vote = { name: 'none', roll: 'none' };
         else { serverPlayerObject.vote = { name: playerData.vote, roll: playerData.voteRoll } };
-        console.log(serverPlayerObject.vote);
-
     }
     allVotesSubmitted() {
         if (this.players.length == this.votesSubmitted) {
@@ -110,6 +108,9 @@ io.sockets.on('connection', (socket) => {
         console.log(`${playerData.name} voted against ${playerData.vote}`);
         let room = rooms.find(r => { return playerData.room == r.name; });
         room.submitVote(playerData);
+
+        // Tell every other player who locked in
+        socket.to(playerData.room).emit('playerLocked', playerData);
 
         if (room.allVotesSubmitted()) {
             console.log(`Determining Winners in ${room.name}`);
@@ -183,7 +184,7 @@ function determineWinners(room) {
                 if (player.vote.name == 'none') {
                     winners.push(player);
                 } else {
-                    let w = players.find((p) => { return p.name != tanner.name && p.name != tanner.vote.name });
+                    let w = players.find((p) => { return p.name != player.name && p.name != player.vote.name });
                     winners.push(w);
                 }
                 return winners;
