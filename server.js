@@ -24,6 +24,7 @@ class Player {
         this.role = undefined;
         this.vote = undefined;
         this.leader = lead; // bool
+        this.votesAgainst = 0;
     }
     swapRole() {
         if (this.role == 'wolf') this.role = 'villager'
@@ -39,8 +40,8 @@ class Room {
     constructor() {
         this.players = [];
         this.leader = undefined;
-        // this.roles = ['wolf', 'wolf', 'wolf', 'villager', 'villager', 'villager', 'alpha', 'robber', 'tanner'];
-        this.roles = ['wolf', 'villager', 'alpha'];
+        this.roles = ['wolf', 'wolf', 'wolf', 'villager', 'villager', 'villager', 'alpha', 'robber', 'tanner'];
+        // this.roles = ['wolf', 'villager', 'wolf'];
         this.name = 'room ' + (rooms.length + 1);
         this.gameRunning = false;
         this.votesSubmitted = 0;
@@ -73,7 +74,7 @@ class Room {
         others.forEach((player) => { player.swapRole(); });
         this.print();
     }
-    robberSwap(robber){
+    robberSwap(robber) {
         this.print();
         let others = this.everyOtherPlayer(robber);
         robber.role = 'villager';
@@ -137,7 +138,7 @@ io.sockets.on('connection', (socket) => {
         socket.to(room.name).emit('newPlayer', player); // Alert other players in room of new player
         sendPlayers(players, leader, room.name);
 
-        console.log('-------' + data.name + ' joined ' + room.name+ '-------');
+        console.log('-------' + data.name + ' joined ' + room.name + '-------');
     });
 });
 
@@ -159,22 +160,13 @@ function determineWinners(room) {
     let players = room.players;
 
 
-    let allWolves = true;
-    let allVillagers = true;
     let votes = [];
+
+    // Turn everyone into either villager or wolf and end if theres a tanner
     for (let i = 0; i < players.length; i++) {
         const player = players[i];
         votes.push(player.vote);
-
         switch (player.role) {
-            case ('villager'): {
-                allWolves = false;
-                break;
-            }
-            case ('wolf'): {
-                allVillagers = false;
-                break;
-            }
             case ('alpha'): {
                 alpha = true;
                 room.alphaSwap(player);
@@ -194,74 +186,77 @@ function determineWinners(room) {
                     let w = players.find((p) => { return p.name != tanner.name && p.name != tanner.vote.name });
                     winners.push(w);
                 }
-                break;
+                return winners;
             }
         }
     }
-    return winners;
-    // Turn everyone into either villager or wolf
-
-
-    // Check who was killed
-    // killed = person with most votes/ if no most votes
-
-    // if nobody killed minority wins. 
-
-    // If person killed is wolf, villagers win
-
-    // else if villager is killed, wolves win
-
-
-
-
-    // If everyone villagers, win condition is not voting
-    // Check if all villagers
-    let villagers = players.filter((player) => { return player.role == 'villager'; });
-    if (villagers.length == players.length) {
-        let win = villagers.every((villager) => { return villager.vote.name == 'none'; });
-        if (win) {
-            villagers.forEach(villager => { winners.push(villager); });
-        }
-        return winners;
-    }
-
-    // If everyone is a wolf, win condition is not voting
-    // Check if all Wolves
-    let wolves = players.filter((player) => { return player.role == 'wolf'; });
+    const villagers = players.filter((player) => { return player.role == 'villager'; });
+    const wolves = players.filter((player) => { return player.role == 'wolf'; });
     if (wolves.length == players.length) {
-        let win = wolves.every((wolf) => { return wolf.vote.name == 'none'; });
+        let win = players.every((villager) => { return villager.vote.name == 'none'; });
         if (win) {
-            wolves.forEach(wolf => { winners.push(wolf); });
+            players.forEach(villager => { winners.push(villager); });
         }
-        console.log(winners);
-        return winners;
+    }
+    else if (villagers.length == wolves.length) {
+        let win = players.every((wolf) => { return wolf.vote.name == 'none'; });
+        if (win) {
+            players.forEach(wolf => { winners.push(wolf); });
+        }
+    } else {
+
+
+
+
+
+        // Check who was killed
+        // killed = person with most votes/ if no most votes        
+
+        console.log(votes);
+        let voteCount = [];
+        let roleKilled = undefined;
+        votes.forEach((vote) => {
+            if (vote.name == 'none') return;
+            // if vote is already in vote count, increment votecount
+            let i = voteCount.findIndex((v) => { return v.name == vote.name });
+            if (i != -1) {
+                voteCount[i].number++;
+                if (voteCount[i].number == 2) {
+                    roleKilled = voteCount[i].role;
+                }
+                return;
+            }
+            voteCount.push({ name: vote.name, number: 1, role: vote.role });
+        });
+
+
+        // If one person targeted 
+        if (voteCount.length == 1) {
+            roleKilled = voteCount.pop().role;
+        }
+
+        // if nobody killed minority wins. 
+        if (roleKilled == undefined) {
+            if (villagers.length > wolves.length) {
+                roleKilled = 'villager';
+            }
+            else {
+                roleKilled = 'wolf';
+            }
+        }
+
+        if (roleKilled == 'wolf') {
+            //add villagers to winners
+            // If person killed is wolf, villagers win
+            wolves.forEach((wolf) => { winners.push(wolf); });
+        } else if (roleKilled == 'villager') {
+            //add wolves to winners
+            // else if villager is killed, wolves win
+            villagers.forEach((villager) => { winners.push(villager); });
+        }
     }
 
-    // for (let i = 0; i < players.length; i++) {
-    //     const player = players[i];
-    //     console.log(`Player: ${player.name}, voted player ${player.vote.name}`);
-    //     // Tanner wins if votes for no one
-    //     if (player.role == 'tanner') {
-    //         if (player.vote == 'none') {
-    //             winners.push(player);
-    //             break;
-    //         } else {
-    //             let w = players.filter((p) => { return p.name != player && p.name != player.vote });
-    //             winners.push(w);
-    //             break;
-    //         }
-    //     }
 
-    //     else if (player.role == 'villager') {
-    //         if (player.vote == 'wolf') {
 
-    //         }
-    //     }
-    // }
-    return winners;
-}
-
-function winnersFromLosers(losers, players) {
-    let winners = players.filter((p) => { return p.name != losers[0] && p.name != losers[1] });
     return winners;
 }

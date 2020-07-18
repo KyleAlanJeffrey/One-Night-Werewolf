@@ -81,9 +81,9 @@ function addPlayer(player) {
         options.item = 'good';
     }
     if (player.leader) options.host = ' (host)';
-    
-    let playerObj = new Player(player.name, undefined, card, listItem);
-    
+
+    let playerObj = new Player(player.name, undefined, undefined, undefined);
+
     playerObj.createCardElement(options);
     playerObj.createListElement(options);
     if (options.item == 'good') myPlayer = playerObj;
@@ -157,6 +157,10 @@ function lockVote() {
     if (!voteLocked) {
         voteLocked = true;
         $('#submit-vote-button').addClass('active');
+        let crosshair = jQuery('<div/>', {
+            "class": `locked`,
+        }).appendTo(myPlayer.cardElement);
+
         socket.emit('submitVote', { name: username, vote: vote, voteRoll: voteRoll, room: room }, endGame);
     }
 }
@@ -210,15 +214,17 @@ class Player {
         jQuery('<span/>', {
             "text": this.name,
         }).appendTo(card);
-    
+
+        this.cardElement = card;
         card.appendTo(board);
 
     }
-    createListElement(player, options) {
+    createListElement(options) {
         let listItem = jQuery('<li/>', {
             "class": `user ${options.item}`,
-            'text': player.name + options.host,
+            'text': this.name + options.host,
         });
+        this.listElement = listItem;
         listItem.appendTo(userList);
 
     }
