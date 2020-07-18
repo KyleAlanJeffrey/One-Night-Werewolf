@@ -180,6 +180,8 @@ function cardClicked(playerObj) {
     if (countdown < 300) {
         if (voteLocked) return;
         if (playerObj.name == username) return;
+        
+        $('#clear-vote-button').removeClass('active');
         $('.crosshair').remove();
         let crosshair = jQuery('<div/>', {
             "class": `crosshair new-card`,
