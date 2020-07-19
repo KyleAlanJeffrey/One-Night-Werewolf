@@ -66,19 +66,14 @@ class Room {
         return this.players.find((p) => { return p.name == name });
     }
     alphaSwap(alpha) {
-        this.print();
         let others = this.everyOtherPlayer(alpha);
         alpha.role = 'wolf';
         others.forEach((player) => { player.swapRole(); });
-        this.print();
     }
     robberSwap(robber) {
-        this.print();
         let others = this.everyOtherPlayer(robber);
         robber.role = 'villager';
         others.forEach((player) => { player.swapRole(); });
-        this.print();
-
     }
     print() {
         console.log(this.name + '\n---------------');

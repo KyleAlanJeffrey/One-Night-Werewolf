@@ -13,8 +13,15 @@
     --lock: #efff0b;
     --title-primary: red;
     --title-secondary: rgb(128, 0, 0);
+    /* Change this for when the kill animations occur */
+    --card-distance: 100px; 
 }
-
+#music{
+    display: none;
+}
+.music-overlay{
+    position: absolute;
+}
 body {
     font-family: 'Alegreya Sans', sans-serif;
     font-weight: 700;
@@ -22,6 +29,7 @@ body {
     background-image: url(../img/bg/bg1.jpg);
     background-size: cover;
     backdrop-filter: blur(5px);
+    opacity: .9;
     user-select: none;
 }
 
@@ -218,6 +226,7 @@ body {
 #countdown-clock {
     position: absolute;
     width: 100%;
+    height: 35%;
     z-index: 101;
     display: none;
     justify-content: center;
@@ -395,6 +404,49 @@ body {
     background-size: cover;
     height: 100%;
     width: 100%;
+}
+
+.card.kill{
+    animation: kill-anim 2s infinite;
+    z-index: 400;
+}
+.card.killed{
+    animation: killed-anim 2s infinite 1.5s;
+}
+.card.killed div{
+    /* width: 100%;
+    height: 100%;
+    background-image: url(../img/hit.gif);
+    background-size: contain;
+    background-repeat: no-repeat; */
+}
+@keyframes kill-anim{
+    0%{
+        transform: rotateZ(0deg);
+        left: 0px;
+    }
+    60%{
+        left: 0px;
+    }
+    90%{
+        left: 200px;
+        transform: rotateZ(10deg);
+    }
+    100%{
+        left: 0px;
+    }
+}
+@keyframes killed-anim{
+    0%{
+        left: 0px;
+    }
+    30%{
+        left: 50px;
+    }
+    100%{
+        left: 0px;
+
+    }
 }
 
 @keyframes glowing-anim {
