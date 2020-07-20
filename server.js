@@ -31,7 +31,7 @@ class Player {
         else if (this.role == 'villager') this.role = 'wolf';
     }
     print() {
-        let string = `Player: ${this.name} Role: ${this.role}`;
+        let string = `Player: ${this.name} Role: ${this.role}, Vote:${this.vote}`;
         console.log(string);
         return string;
     }
@@ -49,8 +49,8 @@ class Room {
     submitVote(playerData) {
         this.votesSubmitted++;
         let serverPlayerObject = this.players.find(player => { return playerData.name == player.name; });
-        if (playerData.vote == 'none') serverPlayerObject.vote = { name: 'none', roll: 'none' };
-        else { serverPlayerObject.vote = { name: playerData.vote, roll: playerData.voteRoll } };
+        if (playerData.vote == 'none') serverPlayerObject.vote = { name: 'none', role: 'none' };
+        else { serverPlayerObject.vote = { name: playerData.vote, role: playerData.voteRole } };
     }
     allVotesSubmitted() {
         if (this.players.length == this.votesSubmitted) {
@@ -110,8 +110,8 @@ io.sockets.on('connection', (socket) => {
         if (room.allVotesSubmitted()) {
             console.log(`Determining Winners in ${room.name}`);
             let winners = determineWinners(room);
-            socket.to(room.name).emit('endGame', winners);
-            callback(winners);
+            socket.to(room.name).emit('endGame', winners, room.players);
+            callback(winners, room.players);
         }
     })
 

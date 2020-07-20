@@ -45,8 +45,8 @@ function startGame(playerData) {
 function playerLocked(playerData) {
     room.playerLocked(playerData);
 }
-function endGame(winners) {
-    room.endGame(winners);
+function endGame(winners, playerData) {
+    room.endGame(winners, playerData);
 }
 
 /*----------------------------------
@@ -94,21 +94,6 @@ function countDownClock() {
     }, 1000);
 }
 
-function setRoles(playerData) {
-    playerData.forEach(p => {
-        let localP = room.players.find((localPlayer) => {
-            return localPlayer.name == p.name;
-        });
-        console.log('Setting ' + localP.name + ' to ' + p.role);
-
-        // If player is client, don't reveal card
-        if (p.name == myPlayer.name) {
-            myPlayer.role = p.role;
-            return;
-        }
-        localP.setRole(p.role);
-    });
-}
 
 function musicStart() {
     music.play();
@@ -169,6 +154,9 @@ class Room {
             this.addPlayer(player);
         });
     }
+    findPlayer(name) {
+        return this.players.find((player) => { return player.name == name; });
+    }
     addPlayer(player) {
         let playerObj = new Player(player.name, undefined, undefined, undefined);
         let options = { color: '', host: '' };
@@ -193,30 +181,52 @@ class Room {
         $('#game-start-message > h2').css('opacity', '1');
 
         setTimeout(() => {
-            setTimeout(() => { setRoles(playerData); }, 1000);
+            setTimeout(() => { this.setRoles(playerData); }, 1000);
             $('#game-start-message').css('top', '100%');
             $('#clear-vote-button').css('display', 'flex');
             $('#submit-vote-button').css('display', 'flex');
-        }, TITLE_ANIM_TIME);
+        }, 1);
         // TITLE_ANIM_TIME
     }
+    setRoles(playerData) {
+        playerData.forEach(p => {
+            let localP = this.players.find((localPlayer) => {
+                return localPlayer.name == p.name;
+            });
 
+            // If player is client, don't reveal card
+            if (p.name == myPlayer.name) {
+                myPlayer.role = p.role;
+                return;
+            }
+            console.log('Setting ' + localP.name + ' to ' + p.role);
+            localP.setRole(p.role);
+        });
+    }
     playerLocked(playerData) {
         let lockedPlayer = this.players.find((player) => { return playerData.name == player.name });
         lockedPlayer.lock();
     }
+    setVotes(playerData) {
+        // Iterate through each player
+        playerData.forEach(p => {
+            // find the local player object
+            let localP = this.players.find((localPlayer) => {
+                return localPlayer.name == p.name;
+            });
+            localP.vote = p.vote;
+            console.log(`Setting ${localP.name} vote to ${localP.vote.name}`);
+        });
 
-    endGame(winners) {
-        console.log(winners);
-        
+    }
+    endGame(winners, playerData) {
+        this.setVotes(playerData);
+        // Reveal my card
+        setTimeout(()=> { myPlayer.setRole(myPlayer.role); }, 2000);
         countdown = 1;
+
         setTimeout(() => {
-            myPlayer.setRole(myPlayer.role);
-            $('.game-start-content').hide();
-
-            // Reveal Card
-            let timeWait =  this.showVotes();
-
+            let timeWait = this.showVotes();
             let text = ' Won!';
             if (winners[0]) {
                 let t = '';
@@ -228,26 +238,35 @@ class Room {
             }
 
             // Print winners.
+            $('.game-start-content').hide();
             $('.game-end-content').text(text);
             $('.game-end-content').show();
 
             // Slide title screen back up. 
             setTimeout(() => { $('#game-start-message').css('top', '0'); }, timeWait + 1500);
 
-        }, 1000)
+        }, 4000)
 
     }
     showVotes() {
-        // iterate through each player seeing who they killed. 
-        this.voteTextContainer = $('#countdown-clock');
+
+        this.killDisplay = $('.kill-display');
+        // Remove all existing animation classes
+        $('.card div').fadeOut(1000);
+        $('.card').removeClass('reveal-card-robber reveal-card-tanner reveal-card-alpha reveal-card-wolf reveal-card-villager');
 
         // Create The header with who a person attacked
-        let t = 500, dt = 3000;
+        let t = 500, dt = 5000;
         this.players.forEach((player) => {
-            setTimeout(() => { player.showVote(this); });
+            setTimeout(() => { player.showVote(this); }, t);
             t += dt;
-        }, t);
+        });
         return t;
+    }
+    clearVoteAnimations() {
+        $('.kill-display h1').remove();
+        $('.kill').removeClass('kill');
+        $('.killed').removeClass('killed');
     }
 }
 
@@ -303,7 +322,41 @@ class Player {
         }).appendTo(this.cardElement);
     }
     showVote(room) {
+        room.clearVoteAnimations();
+        let mainText = jQuery('<h1/>', {
+            'class': 'mx-2',
+            'text': `${this.name} killed `,
+        }).appendTo(room.killDisplay);
+
+        let killText = jQuery('<h1/>', {
+            'class': 'fade-in',
+            'text': this.vote.name,
+        }).appendTo(room.killDisplay);
+
+
+        if (this.vote.name != 'none') {
+            let killed = room.findPlayer(this.vote.name);
+
+            let killSettings = setKillAnimationSettings(this, killed);
+
+            killed.cardElement.addClass('killed');
+            this.cardElement.addClass('kill');
+        } else {
+
+        }
+
+
 
     }
+
+}
+
+function setKillAnimationSettings(playerKilling, playerKilled) {
+    let angle = undefined;
+    let d = playerKilled.cardElement.offset().left - playerKilling.cardElement.offset().left;
+    if (d < 0) { angle = -10 } else { angle = 10 }
+    let root = document.documentElement.style;
+    root.setProperty('--kill-dist', `${d}px`);
+    root.setProperty('--kill-angle', `${angle}deg`);
 
 }
