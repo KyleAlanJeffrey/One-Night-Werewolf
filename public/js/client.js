@@ -24,7 +24,7 @@ $(document).ready(function () {
     socket.on('playerLocked', playerLocked);
     socket.on('endGame', endGame);
     music = document.getElementById('music');
-    music.volume = 0;
+    music.volume = .1;
 
     // console.log(music)
     // music.click();
@@ -221,10 +221,10 @@ class Room {
     }
     endGame(winners, playerData) {
         this.setVotes(playerData);
-        // Reveal my card
-        setTimeout(()=> { myPlayer.setRole(myPlayer.role); }, 2000);
         countdown = 1;
 
+        // Reveal my card at 2s from now and then show votes at 4 seconds from now
+        setTimeout(()=> { myPlayer.setRole(myPlayer.role); }, 2000);
         setTimeout(() => {
             let timeWait = this.showVotes();
             let text = ' Won!';
