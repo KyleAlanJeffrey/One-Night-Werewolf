@@ -14,21 +14,6 @@
     <audio loop src="audio/enigma.mp3" style="display: none;" id='music'>
     </audio>
 
-    <!-- Music -->
-    <!-- <div class="music-overlay">
-        <button onmousedown="musicClicked();">
-            click me
-        </button>
-    </div> -->
-
-    <div id='countdown-clock' class="d-flex text-danger align-content-end justify-content-center py-5">
-        <h1 id="timer">TIME: 300</h1>
-        <div class="kill-display">
-            <!-- <h1 class="mx-3">User 57  KILLED </h1>
-            <h1 class="fade-in">User 69</h1> -->
-        </div>
-    </div>
-
     <!-- Entrance Content -->
     <div id="join-game-overlay">
         <div class="text-danger flex-center-column" style="height: 100%;">
@@ -45,58 +30,31 @@
         </div>
     </div>
 
-    <!-- Server Browser -->
-    <div id="server-browser" class="">
+    <!-- Rules Browser -->
+    <div id="rules-browser" class="">
         <div class="sticky">
-            <span onmousedown="serverBrowserClicked()" class="px-3 py-1 drop-shadow">Server Browser</span>
+            <span onmousedown="rulesBrowserClicked()" class="px-3 py-1 drop-shadow">Rules</span>
         </div>
-        <div class="container server-list">
-            <h1 class="title drop-shadow">Servers</h1>
-            <div class="item p-2"> Server 1: Players: 2/3</div>
-            <div class="item"> Server 1: Players: 2/3</div>
-            <div class="item"> Server 1: Players: 2/3</div>
+        <div class="container">
+            <h1 class="title drop-shadow">Rules</h1>
+            <span>The objective of the game is much like other Mafia-like social deception games. Villagers hope to find
+                all of the wolves in the town, but in this instance, you don't see you're own card. You don't know
+                whether you're a
+                villager or a wolf. Special card descriptions can be seen below:</span>
+            <div class="card-rules m-3">
+                <div class="item mx-5"> <img src="img/cards/alpha.jpg" alt="" srcset=""> The alpha is a wolf
+                    "switcheroo". A Switcheroo
+                    changes all characters on the board from villager to wolf or vice versa, unless there is another
+                    switcheroo, in which the effect is cancelled.</div>
+                <div class="item mx-5"> <img src="img/cards/robber.jpg" alt="" srcset=""> The Robber is also a
+                    "switcheroo". Though, the robber is a villager.</div>
+                <div class="item mx-4"> <img src="img/cards/tanner.jpg" alt="" srcset=""> The Tanner is neither wolf or
+                    villager. The only way for the Tanner to win is to not vote at all. Any person the Tanner votes for
+                    automatically loses along with the Tanner.</div>
+            </div>
         </div>
-    </div>
-    <!-- Sliding Up Message Board -->
-    <div id='game-start-message'>
-        <h1 class="mb-4 game-start-content">THE CLOCK STRIKES 12...</h1>
-        <h2 class="game-start-content">You Have 300 seconds</h2>
-        <h1 class="mb-4 game-end-content"> Have Won.</h1>
-        <!-- <h2 class="game-end-content"> Daylight has returned.</h2> -->
     </div>
 
-    <!-- Cards Go Here -->
-    <div class="container-fluid" id="board">
-        <!-- <div class="card m-5 villager kill">
-            <div class=""></div>
-            <span>User 69</span>
-        </div>
-        <div class="card m-5 wolf killed">
-            <div class=""></div>
-            <span>User 69</span>
-        </div> -->
-    </div>
-
-    <ul class="bg-dark text-white px-4 py-0" id="user-list"></ul>
-
-    <!-- Taskbar -->
-    <div class="taskbar">
-        <a id="submit-vote-button" onclick="lockVote();" class="horizontal aqua">
-            <span class="text">
-                LOCK VOTE
-            </span>
-        </a>
-        <a id="start-game-button" onclick="hostRequestStart()" class="horizontal success">
-            <span class="text">
-                Start Game
-            </span>
-        </a>
-        <a id="clear-vote-button" onclick="clearVote()" class="horizontal secondary active">
-            <span class="text">
-                No Vote
-            </span>
-        </a>
-    </div>
 
     <!-- JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.js"
@@ -108,8 +66,53 @@
         integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
-    <script type="text/javascript" src="js/client.js"></script>
+    <script src="js/game.js"></script>
+    <script>
+        let socket = undefined;
+        let path = 'https://localhost:3000'
+        $(document).ready(function () {
+            socket = io.connect('/');
+            socket.on('redirect', redirect);
+            $('#name-field').val('Gentleman ' + Math.floor(100 * Math.random()));
+
+        });
+        function redirect(destination) {
+            window.location.assign(`${path}/${destination.url}`);
+            console.log(window.location.href)
+
+        }
+        function joinServer() {
+            let name = $('#name-field').val();
+            setCookie('username', name);
+            socket.emit('join-public-game', { name: name, }, (roomURL) => {
+                window.location.assign(roomURL);
+                console.log(window.location.href)
+            });
+
+        }
+        function rulesBrowserClicked() {
+            $('#rules-browser').toggleClass('active');
+        }
+
+    </script>
 
 </body>
 
 </html>
+
+
+
+
+// socket.emit('join', { name: myPlayer.name, }, (playerData, lead, roomName) => {
+// if (lead) {
+// $('#start-game-button').css('display', 'flex');
+// myPlayer.lead = true;
+// }
+
+// room.loadRoom(roomName, playerData, lead);
+// });
+
+
+// Hide overlays
+// $('#join-game-overlay').css('opacity', '0');
+// setTimeout(() => { $('#join-game-overlay').hide(); }, 1000);

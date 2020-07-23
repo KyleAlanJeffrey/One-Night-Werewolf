@@ -1,0 +1,231 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Night</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <audio loop src="audio/enigma.mp3" style="display: none;" id='music'>
+    </audio>
+
+    <!-- Rules Browser -->
+    <div id="rules-browser" class="">
+        <div class="sticky">
+            <span onmousedown="rulesBrowserClicked()" class="px-3 py-1 drop-shadow">Rules</span>
+        </div>
+        <div class="container">
+            <h1 class="title drop-shadow">Rules</h1>
+            <span>The objective of the game is much like other Mafia-like social deception games. Villagers hope to find
+                all of the wolves in the town, but in this instance, you don't see you're own card. You don't know
+                whether you're a
+                villager or a wolf. Special card descriptions can be seen below:</span>
+            <div class="card-rules m-3">
+                <div class="item mx-5"> <img src="img/cards/alpha.jpg" alt="" srcset=""> The alpha is a wolf
+                    "switcheroo". A Switcheroo
+                    changes all characters on the board from villager to wolf or vice versa, unless there is another
+                    switcheroo, in which the effect is cancelled.</div>
+                <div class="item mx-5"> <img src="img/cards/robber.jpg" alt="" srcset=""> The Robber is also a
+                    "switcheroo". Though, the robber is a villager.</div>
+                <div class="item mx-4"> <img src="img/cards/tanner.jpg" alt="" srcset=""> The Tanner is neither wolf or
+                    villager. The only way for the Tanner to win is to not vote at all. Any person the Tanner votes for
+                    automatically loses along with the Tanner.</div>
+            </div>
+        </div>
+    </div>
+
+    <div id='countdown-clock' class="d-flex text-danger align-content-end justify-content-center py-5">
+        <h1 id="timer">TIME: 300</h1>
+        <div class="kill-display">
+        </div>
+    </div>
+
+
+    <!-- Sliding Up Message Board -->
+    <div id='game-start-message'>
+        <h1 class="mb-4 game-start-content">THE CLOCK STRIKES 12...</h1>
+        <h2 class="game-start-content">You Have 300 seconds</h2>
+        <h1 class="mb-4 game-end-content"> Have Won.</h1>
+        <a id="play-again-button" onclick="hostRequestRestart()" class="horizontal success">
+            <span class="text">
+                Play Again
+            </span>
+        </a>
+
+    </div>
+
+    <!-- Cards Go Here -->
+    <div class="container-fluid" id="board"></div>
+
+    <!-- Userlist -->
+    <ul class="bg-dark text-white px-4 py-0" id="user-list"></ul>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <a id="submit-vote-button" onclick="lockVote();" class="horizontal aqua">
+            <span class="text">
+                LOCK VOTE
+            </span>
+        </a>
+        <a id="start-game-button" onclick="hostRequestStart()" class="horizontal success">
+            <span class="text">
+                Start Game
+            </span>
+        </a>
+        <a id="clear-vote-button" onclick="clearVote()" class="horizontal secondary active">
+            <span class="text">
+                No Vote
+            </span>
+        </a>
+    </div>
+
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script type="text/javascript" src="js/game.js"></script>
+
+    <script>
+        const TITLE_ANIM_TIME = 3500;
+        const NO_VOTE = { name: 'none', role: 'none' };
+
+        let board = undefined;
+        let userList = undefined;
+        let socket = undefined;
+        let room = undefined;
+        let countdown = 300;
+        let myPlayer = undefined;
+        let music = undefined;
+
+        $(document).ready(function () {
+            socket = io.connect('/');
+            board = $('#board');
+            userList = $('#user-list');
+
+            music = document.getElementById('music');
+            music.volume = 0;
+
+            socket.on('newPlayer', addPlayer);
+            socket.on('startGame', startGame);
+            socket.on('restartGame', restartGame);
+            socket.on('playerLocked', playerLocked);
+            socket.on('endGame', endGame);
+            socket.on('connect', connect);
+        });
+
+        /*----------------------------------
+                Socket Listener Events
+        ------------------------------------*/
+        function connect() {
+            console.log('Connection to Socket and Loading Players');
+            username = getCookie('username');
+            socket.emit('room-connection', { "roomName": window.location.pathname.substr(1), "username": getCookie('username') }, (roomName, playerData, lead) => {
+                room = new Room('waiting', roomName);
+                console.log(lead)
+                room.loadRoom(roomName, playerData, lead);
+                myPlayer = room.findPlayer(username);
+                if (myPlayer.lead) $('#start-game-button').css('display', 'flex');
+            });
+        }
+        function addPlayer(playerData) {
+            room.addPlayer(playerData);
+        }
+        function startGame(playerData) {
+            room.startGame(playerData)
+        }
+        function restartGame(playerData) {
+            room.restartGame(playerData);
+            $('#game-start-message').css('top', '100%');
+          }
+        function playerLocked(playerData) {
+            room.playerLocked(playerData);
+        }
+        function endGame(winners, playerData) {
+            room.endGame(winners, playerData);
+        }
+
+        /*----------------------------------
+                Socket Emit Events
+        ------------------------------------*/
+        function hostRequestStart() {
+            if (room.players.length < 3) return;
+            socket.emit('hostStartRequest', room.name, (playerData) => {
+                room.startGame(playerData);
+            });
+            $('#start-game-button').hide();
+        }
+        function hostRequestRestart() {
+            if (room.players.length < 3) return;
+            socket.emit('hostRestartRequest', room.name, (playerData) => {
+                console.log(playerData);
+                restartGame(playerData);
+            });
+        }
+
+        /*------------------------
+                Button EVENTS
+        -------------------------*/
+        function countDownClock() {
+            $('#timer').show().removeClass('new-card').addClass('new-card');
+            let x = setInterval(() => {
+                countdown--;
+                $('#timer').text('TIME: ' + countdown);
+                if (!countdown) {
+                    clearInterval(x);
+                }
+            }, 1000);
+        }
+        function musicStart() {
+            music.play();
+        }
+        function clearVote() {
+            if (myPlayer.locked) return;
+            if (myPlayer.vote.name == 'none') return;
+            myPlayer.vote = NO_VOTE;
+
+            $('#clear-vote-button').toggleClass('active');
+            $('.crosshair').remove();
+        }
+        function lockVote() {
+            if (!myPlayer.locked) {
+                $('#submit-vote-button').addClass('active');
+                myPlayer.lock();
+                socket.emit('submitVote', { name: myPlayer.name, vote: myPlayer.vote.name, voteRoll: myPlayer.vote.role, room: room.name }, endGame);
+            }
+        }
+        function rulesBrowserClicked() {
+            $('#rules-browser').toggleClass('active');
+        }
+
+        /*------------------------
+                CARD EVENTS
+        -------------------------*/
+        function cardClicked(playerObj) {
+            // if game started
+            if (countdown < 300 && room.phase == 'voting') {
+                if (myPlayer.voteLocked) return;
+                if (playerObj.name == myPlayer.name) return;
+
+                $('#clear-vote-button').removeClass('active');
+                $('.crosshair').remove();
+                let crosshair = jQuery('<div/>', {
+                    "class": `crosshair new-card`,
+                }).appendTo(playerObj.cardElement);
+                myPlayer.vote = playerObj;
+            }
+        }
+    </script>
+</body>
+
+</html>

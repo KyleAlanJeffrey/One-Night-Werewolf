@@ -14,15 +14,18 @@
     --title-primary: red;
     --title-secondary: rgb(128, 0, 0);
     /* Change this for when the kill animations occur */
-    --kill-dist: 100px; 
+    --kill-dist: 100px;
     --kill-angle: 10px;
 }
-#music{
+
+#music {
     display: none;
 }
-.music-overlay{
+
+.music-overlay {
     position: absolute;
 }
+
 body {
     font-family: 'Alegreya Sans', sans-serif;
     font-weight: 700;
@@ -37,20 +40,23 @@ body {
 /* ------------------------
         Custom Settings
 -------------------------*/
-@keyframes fade-in-anim{
-    from{
+
+@keyframes fade-in-anim {
+    from {
         top: -50px;
         opacity: 0;
     }
-    to{
+    to {
         top: 0px;
         opacity: 1;
     }
 }
-.fade-in{
+
+.fade-in {
     position: relative;
     animation: fade-in-anim 1s;
 }
+
 .drop-shadow {
     text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--good), 0 0 40px var(--good), 0 0 50px var(--good), 0 0 60px var(--good), 0 0 70px var(--good);
 }
@@ -58,14 +64,16 @@ body {
 /* ------------------------
         Overlays
 -------------------------*/
-.kill-display{
+
+.kill-display {
     justify-content: center;
     align-items: center;
     display: inline-flex;
     flex-direction: row;
     width: 100%;
 }
-.server-list{
+
+#rules-browser .container {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -73,37 +81,49 @@ body {
     width: 100%;
     height: 100%;
     color: var(--good);
-
 }
-.server-list .title{
+
+#rules-browser .title {
     font-size: 100px;
     color: var(--bad);
     animation: glowing-font-anim 4s ease-in-out infinite alternate;
-
 }
-.server-list .item{
+
+#rules-browser .card-rules {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
     width: 100%;
-    height: 10%;
-    border: var(--bad) solid 3px;
-    border-radius: 5px;
-    font-size: x-large;
-    margin: 8px 0;
-
+    height: 75%;
+    text-align: center;
+    font-size: large;
+    overflow: hidden;
 }
-#server-browser {
+#rules-browser .card-rules .item {
+    width: 25%;
+}
+
+#rules-browser .card-rules img {
+    /* height: 55%; */
+    width: 100%;
+}
+
+#rules-browser {
     position: absolute;
     background-color: black;
     height: 100%;
     width: 100%;
-    z-index: 200;
+    z-index: 1000;
     top: -100%;
     transition: top 1s ease-in-out;
+    font-size: x-large;
 }
 
-#server-browser.active {
+#rules-browser.active {
     top: 0%;
 }
-#server-browser .sticky {
+
+#rules-browser .sticky {
     position: absolute;
     display: flex;
     justify-content: center;
@@ -111,23 +131,28 @@ body {
     width: 100%;
     transition: 2s ease-in-out;
 }
-#server-browser .sticky span {
+
+#rules-browser .sticky span {
     border: var(--good) solid 3px;
     border-radius: 0px 0px 20px 20px;
     color: var(--good);
     animation: flashing-anim 3s ease-in-out infinite alternate;
     transition: 2s ease-in-out;
 }
-#server-browser .sticky span:hover {
+
+#rules-browser .sticky span:hover {
     cursor: pointer;
     animation: none;
 }
-#server-browser.active .sticky {
+
+#rules-browser.active .sticky {
     top: 96%;
 }
-#server-browser.active .sticky span{
+
+#rules-browser.active .sticky span {
     border-radius: 20px 20px 0px 0px;
 }
+
 #join-game-overlay {
     position: absolute;
     z-index: 100;
@@ -429,49 +454,50 @@ body {
     width: 100%;
 }
 
-.card.kill{
+.card.kill {
     animation: kill-anim 1s;
     z-index: 400;
 }
 
-.card.killed{
+.card.killed {
     /* animation: name duration timing-function delay iteration-count direction fill-mode; */
-    animation: killed-anim 1s  .8s;
+    animation: killed-anim 1s .8s;
 }
 
-@keyframes kill-anim{
-    0%{
+@keyframes kill-anim {
+    0% {
         transform: rotateZ(0deg);
         left: 0px;
     }
-    60%{
+    60% {
         left: 0px;
     }
-    90%{
+    90% {
         left: var(--kill-dist);
         transform: rotateZ(var(--kill-angle));
     }
-    100%{
+    100% {
         left: 0px;
     }
 }
-@keyframes killed-anim{
-    0%{
+
+@keyframes killed-anim {
+    0% {
         left: 0px;
     }
-    15%{
+    15% {
         left: 10px;
     }
-    30%{
+    30% {
         left: -10px;
     }
-    45%{
+    45% {
         left: 10px;
     }
-    60%{
+    60% {
         left: -10px;
     }
-    100%{
+    100% {
         left: 0px;
     }
 }

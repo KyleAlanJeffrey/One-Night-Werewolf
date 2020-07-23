@@ -1,0 +1,2 @@
+- Have servers with ID's
+- app.get(/:gameid){ res.emit('redirect', )}

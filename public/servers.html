@@ -1,0 +1,118 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Night</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+        integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <audio loop src="audio/enigma.mp3" style="display: none;" id='music'>
+    </audio>
+
+    <!-- Music -->
+    <!-- <div class="music-overlay">
+        <button onmousedown="musicClicked();">
+            click me
+        </button>
+    </div> -->
+
+    <div id='countdown-clock' class="d-flex text-danger align-content-end justify-content-center py-5">
+        <h1 id="timer">TIME: 300</h1>
+        <div class="kill-display">
+            <!-- <h1 class="mx-3">User 57  KILLED </h1>
+            <h1 class="fade-in">User 69</h1> -->
+        </div>
+    </div>
+
+    <!-- Entrance Content -->
+    <div id="join-game-overlay">
+        <div class="text-danger flex-center-column" style="height: 100%;">
+            <h1 id="title">Midnight</h1>
+            <h2 class="text-success" style="font-size: large;">Name:</h2>
+            <div class="form-inline my-2">
+                <input type="text" class="form-control py-4 px-5 mx-4" id="name-field">
+            </div>
+            <div class="join-container">
+                <a onclick="joinServer();" class="horizontal success">
+                    <span class="text"> New Server </span>
+                </a>
+                <a onclick="joinServer();" class="horizontal success">
+                    <span class="text"> Join Server </span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Server Browser -->
+    <div id="server-browser" class="">
+        <div class="sticky">
+            <span onmousedown="serverBrowserClicked()" class="px-3 py-1 drop-shadow">Server Browser</span>
+        </div>
+        <div class="container server-list">
+            <h1 class="title drop-shadow">Servers</h1>
+            <div class="item p-2"> Server 1: Players: 2/3</div>
+            <div class="item"> Server 1: Players: 2/3</div>
+            <div class="item"> Server 1: Players: 2/3</div>
+        </div>
+    </div>
+    <!-- Sliding Up Message Board -->
+    <div id='game-start-message'>
+        <h1 class="mb-4 game-start-content">THE CLOCK STRIKES 12...</h1>
+        <h2 class="game-start-content">You Have 300 seconds</h2>
+        <h1 class="mb-4 game-end-content"> Have Won.</h1>
+        <!-- <h2 class="game-end-content"> Daylight has returned.</h2> -->
+    </div>
+
+    <!-- Cards Go Here -->
+    <div class="container-fluid" id="board">
+        <!-- <div class="card m-5 villager kill">
+            <div class=""></div>
+            <span>User 69</span>
+        </div>
+        <div class="card m-5 wolf killed">
+            <div class=""></div>
+            <span>User 69</span>
+        </div> -->
+    </div>
+
+    <ul class="bg-dark text-white px-4 py-0" id="user-list"></ul>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <a id="submit-vote-button" onclick="lockVote();" class="horizontal aqua">
+            <span class="text">
+                LOCK VOTE
+            </span>
+        </a>
+        <a id="start-game-button" onclick="hostRequestStart()" class="horizontal success">
+            <span class="text">
+                Start Game
+            </span>
+        </a>
+        <a id="clear-vote-button" onclick="clearVote()" class="horizontal secondary active">
+            <span class="text">
+                No Vote
+            </span>
+        </a>
+    </div>
+
+    <!-- JS, Popper.js, and jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+        integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
+    <script type="text/javascript" src="js/client.js"></script>
+
+</body>
+
+</html>
